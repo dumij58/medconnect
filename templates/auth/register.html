@@ -4,6 +4,10 @@
   <div class="h1">{% block title %}Sign Up{% endblock %}</h1>
 {% endblock %}
 
+{% for message in get_flashed_messages() %}
+<div class="flash text-danger">* {{ message }}</div>
+{% endfor %}
+
 {% block content %}
     {{ form.csrf_token }}
     {% from "_formhelpers.html" import render_field %}
@@ -19,11 +23,7 @@
                 {{ render_field(form.confirm, class="form-control") }}
             </dl>
 
-            {% for message in get_flashed_messages() %}
-            <div class="flash text-danger">* {{ message }}</div>
-            {% endfor %}
-
-            <button class="btn btn-primary my-3" type="submit">Sign Up</button>
+            {{ form.submit(class="btn btn-primary my-3") }}
         </form>
         <p class="text-center mt-5">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
     </div>

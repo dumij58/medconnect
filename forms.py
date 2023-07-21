@@ -1,39 +1,63 @@
-from wtforms import Form, StringField, PasswordField, DateField, EmailField
-from wtforms.validators import InputRequired, Length, EqualTo, Email, ValidationError
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, DateField, EmailField, SubmitField, TelField
+from wtforms.validators import Length, EqualTo, Email, ValidationError
 
 def data_required(form, field):
     if not field.data:
-        raise ValidationError('Field is required.')
+        if field.name == "dob":
+            field_name = "Date of Birth"
+        elif field.name == "full_name":
+            field_name = "Full Name"
+        else:
+            field_name = field.name
+        raise ValidationError(message=f'{field_name.capitalize()} is required.')
     
-def len_check(form, field):
-    if len(field.data) < 4:
-        raise ValidationError('Username must be more than 4 characters.')
-    elif len(field.data) > 25:
-        raise ValidationError('Username must be less than 25 characters.')
 
-class RegistrationForm(Form):
+def length(min=-1, max=-1):
+
+    def _length(form, field):
+        if field.name == "full_name":
+            field_name = "Full Name"
+        else:
+            field_name = field.name
+        l = field.data and len(field.data) or 0
+        if l < min:
+            raise ValidationError(message=f'{field_name.capitalize()} must be more than %d characters.' % (min))
+        elif max != -1 and l > max:
+            raise ValidationError(message=f'{field_name.capitalize()} must be less than %d characters.' % (max))
+
+    return _length
+
+class RegistrationForm(FlaskForm):
     username = StringField('Username', [
-        #Length(min=4, max=25),
-        len_check,
-        data_required
+        data_required,
+        length(min=4, max=25)
     ])
     full_name = StringField('Full Name', [
+        data_required
     ])
     dob = DateField('Date of Birth', [
+        data_required
     ])
     email = EmailField('Email Address', [
-         Email(),
-        Length(min=6, max=35)
+        data_required,
+        Email(),
+        length(min=6, max=35)
     ])
-    contact = StringField('Contact No.', [
-        Length(min=10, max=12)
+    contact = TelField('Contact No.', [
+        data_required,
+        Length(min=10, max=12, message='Invalid contact number')
     ])
     password = PasswordField('New Password', [
-        EqualTo('confirm')
+        data_required,
+        EqualTo('confirm', message="Passwords doesn't match")
     ])
-    confirm = PasswordField('Repeat Password')
+    confirm = PasswordField('Repeat Password', [
+        data_required
+    ])
+    submit = SubmitField('Sign Up')
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField('Username', [
         Length(min=4, max=25)
     ])

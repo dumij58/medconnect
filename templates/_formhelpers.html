@@ -3,9 +3,9 @@
     <div class="mb-3">
         {{ field(**kwargs) | safe }}
         {% if field.errors %}
-            {% for error in field.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-            {% endfor %}
+            <div class="errors">
+                <div class="text-danger">* {{ field.errors[0] }}</div>
+            </div>
         {% endif %}
     </div>
 {% endmacro %}
