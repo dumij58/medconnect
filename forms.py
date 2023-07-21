@@ -1,9 +1,21 @@
 from wtforms import Form, StringField, PasswordField, DateField, EmailField
-from wtforms.validators import Length, EqualTo, Email
+from wtforms.validators import InputRequired, Length, EqualTo, Email, ValidationError
+
+def data_required(form, field):
+    if not field.data:
+        raise ValidationError('Field is required.')
+    
+def len_check(form, field):
+    if len(field.data) < 4:
+        raise ValidationError('Username must be more than 4 characters.')
+    elif len(field.data) > 25:
+        raise ValidationError('Username must be less than 25 characters.')
 
 class RegistrationForm(Form):
     username = StringField('Username', [
-        Length(min=4, max=25)
+        #Length(min=4, max=25),
+        len_check,
+        data_required
     ])
     full_name = StringField('Full Name', [
     ])
@@ -17,7 +29,7 @@ class RegistrationForm(Form):
         Length(min=10, max=12)
     ])
     password = PasswordField('New Password', [
-        EqualTo('confirm', message='Passwords must match')
+        EqualTo('confirm')
     ])
     confirm = PasswordField('Repeat Password')
 
@@ -26,6 +38,6 @@ class LoginForm(Form):
         Length(min=4, max=25)
     ])
     password = PasswordField('Password', [
-        EqualTo('confirm', message='Passwords must match')
+        EqualTo('confirm')
     ])
     confirm = PasswordField('Repeat Password')

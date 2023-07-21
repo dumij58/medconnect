@@ -6,7 +6,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from .forms import RegistrationForm, LoginForm
 
-from medconnect.db import get_db
+from .db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -15,26 +15,38 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST':
         username = form.username.data
+        full_name = form.full_name.data
+        dob = form.dob.data
+        email = form.email.data
+        contact = form.contact.data
         password = form.password.data
-        db = get_db()
+        confirm = form.confirm.data
+        # db = get_db()
         error = None
 
-        if not username:
-            error = 'Username is required.'
-        elif not password:
-            error = 'Password is required.'
+        print(form.username.data)
+        print(form.username.errors)
 
-        # if error is None:
-        #    try:
-        #        db.execute(
-        #            "INSERT INTO user (username, password) VALUES (?, ?)",
-        #            (username, generate_password_hash(password)),
-        #        )
-        #        db.commit()
-        #    except db.IntegrityError:
-        #        error = f"User {username} is already registered."
-        #    else:
-        #        return redirect(url_for("auth.login"))
+        if form.validate_on_submit():
+            flash('Registration successful!', 'success')
+            return redirect(url_for('auth.register'))
+
+        if not username:
+            error = "Username is required."
+        elif not full_name:
+            error = "Full name is required."
+        elif not dob:
+            error = "Date of birth is required."
+        elif not email:
+            error = "Email is required."
+        elif not contact:
+            error = "Contact is required."
+        elif not password:
+            error = "Password is required."
+        elif not confirm:
+            error = "Confirm your password."
+        elif password != confirm:
+            error = "Passwords doesn't match."
 
         flash(error)
 
@@ -52,7 +64,7 @@ def login():
 
         if not username:
             error = 'Username is required.'
-            
+
         elif not password:
             error = 'Password is required.'
 
@@ -77,3 +89,14 @@ def load_logged_in_user():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+
+        return view(**kwargs)
+
+    return wrapped_view
