@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, DateField, EmailField, SubmitField, TelField
 from wtforms.validators import Length, EqualTo, Email, ValidationError
 
+from .db import get_db
+
 def data_required(form, field):
     if not field.data:
         if field.name == "dob":
@@ -22,17 +24,19 @@ def length(min=-1, max=-1):
             field_name = field.name
         l = field.data and len(field.data) or 0
         if l < min:
-            raise ValidationError(message=f'{field_name.capitalize()} must be more than %d characters.' % (min))
+            raise ValidationError(message=f'{field_name.capitalize()} must be at least %d characters.' % (min))
         elif max != -1 and l > max:
-            raise ValidationError(message=f'{field_name.capitalize()} must be less than %d characters.' % (max))
+            raise ValidationError(message=f'{field_name.capitalize()} must be less than %d characters.' % (max+1))
 
     return _length
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', [
         data_required,
         length(min=4, max=25)
     ])
+            
     full_name = StringField('Full Name', [
         data_required
     ])
@@ -50,18 +54,20 @@ class RegistrationForm(FlaskForm):
     ])
     password = PasswordField('New Password', [
         data_required,
-        EqualTo('confirm', message="Passwords doesn't match")
     ])
     confirm = PasswordField('Repeat Password', [
-        data_required
+        data_required,
+        EqualTo('password', message="Passwords doesn't match")
     ])
     submit = SubmitField('Sign Up')
+                
 
 class LoginForm(FlaskForm):
     username = StringField('Username', [
-        Length(min=4, max=25)
+        data_required,
+        length(min=4, max=25)
     ])
     password = PasswordField('Password', [
-        EqualTo('confirm')
+        data_required,
     ])
-    confirm = PasswordField('Repeat Password')
+    submit = SubmitField('Log In')

@@ -56,11 +56,15 @@
     </nav>
 
   <section class="content">
-    {% if g.user %}
-      {% for message in get_flashed_messages() %}
-      <div class="flash text-center m-3 p-3 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+
+    <!-- Use flash messages with categories to display different colors of flash messages (using Bootstrap colors) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash text-center m-3 p-3 text-{{ category }}-emphasis bg-{{ category }}-subtle border border-{{ category }}-subtle rounded-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
     <header class="text-center my-3">
       {% block header %}{% endblock %}

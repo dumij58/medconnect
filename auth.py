@@ -12,35 +12,54 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
+    # Initialize registration form, database and variables
     form = RegistrationForm()
+    db = get_db()
+    uname = form.username.data
+    full_name = form.full_name.data
+    dob = form.dob.data
+    email = form.email.data
+    contact = form.contact.data
 
-    if request.method == 'POST':
-        if not form.validate():
-            print(form.username.errors)
-            print(form.username.data)
-        else:
-            flash('Registration successful!', 'success')
+    # Ensure data is validated on submit
+    if request.method == 'POST' and form.validate():
+
+        print(db.execute('SELECT id FROM patient WHERE username = ?', (uname,)))
+            #flash(f'User {uname} already exist.', 'danger')
+
+        # Update database
+        try:
+            #print(f"{uname}, {full_name}, {dob}, {email}, {contact}, {generate_password_hash(form.password.data)}")
+            db.execute(
+                'INSERT INTO patient (username, full_name, dob, email, contact, hash) VALUES (?, ?, ?, ?, ?, ?)', 
+                (uname, full_name, dob, email, contact, generate_password_hash(form.password.data))
+            )
+            #db.commit()
+            print("Database Updated!")
+        except db.Error as er:
+            print("Updating database failed!")
+            #print('SQLite error: %s' % (' '.join(er.args)))
+            #print("Exception class is: ", er.__class__)
+            flash('Registration failed! Please contact support', 'danger')
             return redirect(url_for('auth.register'))
 
-    return render_template('auth/register.html', form = form)
+        # Flash a message and redirect to login page
+        flash('Registration successful!')
+        return redirect(url_for('auth.login'))
+    
+    else:
+        # Render the registration form
+        flash('Create your MedConnect account here!', 'success')
+        return render_template('auth/register.html', form = form)
 
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     form = LoginForm(request.form)
-    if request.method == 'POST':
-        username = form.username.data
-        password = form.password.data
-        db = get_db()
-        error = None
 
-        if not username:
-            error = 'Username is required.'
-
-        elif not password:
-            error = 'Password is required.'
-
-        flash(error)
+    if request.method == 'POST' and form.validate():
+        flash('Login successful!', 'success')
+        return redirect(url_for('auth.login'))
 
     return render_template('auth/login.html', form = form)
 

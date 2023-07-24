@@ -8,18 +8,12 @@
     {{ form.csrf_token }}
     {% from "_formhelpers.html" import render_field %}
     <div class="container">
-        <form method=post action="{{ url_for('auth.login') }}">
+        <form method="post" action="{{ url_for('auth.login') }}">
             <dl>
                 {{ render_field(form.username, class="form-control", autocomplete="off") }}
                 {{ render_field(form.password, class="form-control") }}
-                {{ render_field(form.confirm, class="form-control") }}
             </dl>
-            
-            {% for message in get_flashed_messages() %}
-            <div class="flash text-danger">* {{ message }}</div>
-            {% endfor %}
-
-            <button class="btn btn-primary my-3" type="submit">Log In</button>
+            {{ form.submit(class="btn btn-primary my-3") }}
         </form>
         <p class="text-center mt-5">Don't have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.register') }}">Sign Up</a></p>
     </div>
