@@ -2,8 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, DateField, EmailField, SubmitField, TelField
 from wtforms.validators import Length, EqualTo, Email, ValidationError
 
-from .db import get_db
-
 def data_required(form, field):
     if not field.data:
         if field.name == "dob":
