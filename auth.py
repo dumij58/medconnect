@@ -18,26 +18,19 @@ def register():
 
     # Ensure data is validated on submit
     if request.method == 'POST' and form.validate():
-
-        # Post validate user input (Validation code is in forms.py)
-        uname = str(form.username.data).lower()
-        email = form.email.data
-        ## Check if user exist
-        if Patient.query.filter(Patient.username == uname).first():
-            flash(f"User {uname} already exist.", "danger")
-            return redirect(url_for('auth.register'))
-        if Patient.query.filter(Patient.email == email).first():
-            flash(f"User with email ({email}) already exist.", "danger")
-            return redirect(url_for('auth.register'))
         
         # Update database
         new_patient = Patient(
-            username = uname,
-            full_name = form.full_name.data,
-            dob = form.dob.data,
-            email = email,
-            contact = form.contact.data,
+            username = str(form.username.data).lower(),
             hash = generate_password_hash(form.password.data),
+            full_name = form.full_name.data,
+            gender = form.gender.data,
+            dob = form.dob.data,
+            email = form.email.data,
+            contact = form.contact.data,
+            address = form.address.data,
+            emergency_contact = form.emergency_contact.data,
+            medical_history = form.medical_history.data,
             created = datetime.now()
         )
         ## Add records to database and commit all changes
