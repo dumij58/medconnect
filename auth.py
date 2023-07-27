@@ -71,12 +71,11 @@ def doc_register():
         db.session.commit()
         
         # Flash a message and redirect to login page
-        flash('Registration Successful! Your details are being verified by admins. Registration confirmation message will be sent to your email.', "success")
+        flash('Registration Successful!', "success")
+        flash('Your details are being verified by administrators. Registration confirmation message will be sent to your email.', "info")
         return redirect(url_for('auth.login'))
     
     # Render the registration form
-    flash('Registration Successful!', "success")
-    flash('Your details are being verified by administrators. Registration confirmation message will be sent to your email.', "info")
     return render_template('auth/doc_register.html', form = form)
 
 
