@@ -6,15 +6,15 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timezone
 
-from .models import db, Patient
-from .forms import RegistrationForm, LoginForm
+from .models import db, Patient, Doctor
+from .forms import PtRegForm, DocRegForm, LoginForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register/pt', methods=('GET', 'POST'))
 def register():
     # Initialize registration form
-    form = RegistrationForm()
+    form = PtRegForm()
 
     # Ensure data is validated on submit
     if request.method == 'POST' and form.validate():
@@ -43,6 +43,41 @@ def register():
     
     # Render the registration form
     return render_template('auth/register.html', form = form)
+
+
+@bp.route('/register/doc', methods=('GET', 'POST'))
+def doc_register():
+    # Initialize registration form
+    form = DocRegForm()
+
+    # Ensure data is validated on submit
+    if request.method == 'POST' and form.validate():
+        
+        # Update database
+        new_doctor = Doctor(
+            username = str(form.username.data).lower(),
+            hash = generate_password_hash(form.password.data),
+            full_name = form.full_name.data,
+            gender = form.gender.data,
+            dob = form.dob.data,
+            email = form.email.data,
+            contact = form.contact.data,
+            reg_no = form.reg_no.data,
+            specialities = form.specialities.data,
+            created = datetime.now()
+        )
+        ## Add records to database and commit all changes
+        db.session.add(new_doctor)
+        db.session.commit()
+        
+        # Flash a message and redirect to login page
+        flash('Registration Successful! Your details are being verified by admins. Registration confirmation message will be sent to your email.', "success")
+        return redirect(url_for('auth.login'))
+    
+    # Render the registration form
+    flash('Registration Successful!', "success")
+    flash('Your details are being verified by administrators. Registration confirmation message will be sent to your email.', "info")
+    return render_template('auth/doc_register.html', form = form)
 
 
 @bp.route('/login', methods=('GET', 'POST'))
