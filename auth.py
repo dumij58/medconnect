@@ -86,9 +86,15 @@ def login():
 
     if request.method == 'POST' and form.validate():
 
-        user = Patient.query.filter(Patient.username == form.username.data).first()
         flask_session.clear()
-        flask_session['user_id'] = user.id
+        pt = Patient.query.filter(Patient.username == form.username.data).first()
+        doc = Doctor.query.filter(Doctor.username == form.username.data).first()
+        if pt:
+            flask_session['user_type'] = "patient"
+            flask_session['user_id'] = pt.id
+        elif doc:
+            flask_session['user_type'] = "doctor"
+            flask_session['user_id'] = doc.id
         
         flash('Login successful!', 'success')
         return redirect(url_for('index'))
@@ -98,12 +104,15 @@ def login():
 
 @bp.before_app_request
 def load_logged_in_user():
+    user_type = flask_session.get('user_type')
     user_id = flask_session.get('user_id')
 
     if user_id is None:
         g.user = None
-    else:
+    elif user_type == 'patient':
         g.user = Patient.query.filter(Patient.id == user_id).first()
+    elif user_type == 'doctor':
+        g.user = Doctor.query.filter(Doctor.id == user_id).first()
 
 
 @bp.route('/logout')
