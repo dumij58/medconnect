@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, DateField, EmailField, SubmitField, TelField
 from wtforms.validators import Length, EqualTo, Email, ValidationError
+from werkzeug.security import check_password_hash
+
+from .models import db, Patient
 
 def data_required(form, field):
     if not field.data:
@@ -59,13 +62,24 @@ class RegistrationForm(FlaskForm):
     ])
     submit = SubmitField('Sign Up')
                 
+def check_user(form, field):
+    if not Patient.query.filter(Patient.username == field.data).first():
+        raise ValidationError(message=f"User {field.data} doesn't exist.")
+    
+def check_pass(form, field):
+    user = Patient.query.filter(Patient.username == form.username.data).first()
+    if user:
+        if not check_password_hash(user.hash, form.password.data):
+            raise ValidationError(message=f"Incorrect password.")
 
 class LoginForm(FlaskForm):
     username = StringField('Username', [
         data_required,
-        length(min=4, max=25)
+        length(min=4, max=25),
+        check_user
     ])
     password = PasswordField('Password', [
         data_required,
+        check_pass
     ])
     submit = SubmitField('Log In')

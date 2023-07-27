@@ -14,7 +14,6 @@ def create_app():
     app.config.from_mapping(
         # SECRET_KEY = secrets.token_hex(),
         SECRET_KEY = "test",
-        # DATABASE=os.path.join(app.instance_path, 'medconnect.sqlite'),
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.instance_path, 'medconnect.sqlite'),
         SQLALCHEMY_TRACK_MODIFICATIONS = False
     )

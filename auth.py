@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
+    Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timezone
@@ -13,15 +13,14 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
-    # Initialize registration form, database and variables
+    # Initialize registration form
     form = RegistrationForm()
 
     # Ensure data is validated on submit
     if request.method == 'POST' and form.validate():
 
         # Post validate user input (Validation code is in forms.py)
-        uname = form.username.data
-        uname = str(uname).lower()
+        uname = str(form.username.data).lower()
         email = form.email.data
         ## Check if user exist
         if Patient.query.filter(Patient.username == uname).first():
@@ -49,37 +48,40 @@ def register():
         flash('Registration Successful!', "success")
         return redirect(url_for('auth.login'))
     
-    else:
-        # Render the registration form
-        return render_template('auth/register.html', form = form)
+    # Render the registration form
+    return render_template('auth/register.html', form = form)
 
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    # Initialize login form
     form = LoginForm(request.form)
 
     if request.method == 'POST' and form.validate():
-        flash('Login successful!', 'success')
-        return redirect(url_for('auth.login'))
 
+        user = Patient.query.filter(Patient.username == form.username.data).first()
+        flask_session.clear()
+        flask_session['user_id'] = user.id
+        
+        flash('Login successful!', 'success')
+        return redirect(url_for('index'))
+    
     return render_template('auth/login.html', form = form)
 
-"""
+
 @bp.before_app_request
 def load_logged_in_user():
-    user_id = session.get('user_id')
+    user_id = flask_session.get('user_id')
 
     if user_id is None:
         g.user = None
     else:
-        g.user = g.db.execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        g.user = Patient.query.filter(Patient.id == user_id).first()
 
 
 @bp.route('/logout')
 def logout():
-    session.clear()
+    flask_session.clear()
     return redirect(url_for('index'))
 
 
@@ -92,4 +94,4 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
-    """
+    
