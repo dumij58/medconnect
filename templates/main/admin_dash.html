@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+    <div class="h3 mb-3 text-center">Pending Doctor Validations</div>
+    {% if rows %}
+    <div class="container p-2 border border-primary-subtle rounded">
+        <div class="container-fluid docpreval-scroll">
+            <div class="accordion my-3" id="accordion">
+            {% for row in rows %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ row.id }}" aria-expanded="false" aria-controls="collapse_{{ row.id }}">
+                        {{ row.username }}
+                    </button>
+                </h2>
+                <div id="collapse_{{ row.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                        <table class="table table-striped">
+                            <tr><td>Full Name</td><td>{{ row.full_name }}</td></tr>
+                            <tr><td>Date of birth</td><td>{{ row.dob }}</td></tr>
+                            <tr><td>Gender</td><td>{{ row.gender | gender }}</td></tr>
+                            <tr><td>Contact No.</td><td>{{ row.contact | phone_no }}</td></tr>
+                            <tr><td>Email</td><td>{{ row.email }}</td></tr>
+                            <tr><td>Reg No.</td><td>{{ row.reg_no }}</td></tr>
+                            <tr><td>Specialities</td><td>{{ row.specialities }}</td></tr>
+                            <tr><td>Submitted</td><td>{{ row.created | datetime }}</td></tr>
+                        </table>
+                        {% from "_modalhelpers.html" import render_modal %}
+                        <button type="button" class="m-2 btn btn-primary" data-bs-toggle="modal" data-bs-target="#verifyModal{{ row.id }}">Validate</button>
+                        {{ render_modal(
+                            "verifyModal" + str(row.id), "Are you sure?", 
+                            "This action adds " ~ row.username ~ " to the database", 
+                            "Validate", url_for('main.doc_validate', doc_id = row.id), "primary" ) }}
+                        <button type="button" class="m-2 btn btn-danger" data-bs-toggle="modal" data-bs-target="#denyModal{{ row.id }}">Reject</button>
+                        {{ render_modal(
+                            "denyModal" + str(row.id), "Are you sure?", 
+                            "This action rejects " ~ row.username ~ "'s registration and deletes the data from the database", 
+                            "Reject", url_for('main.doc_reject', doc_id = row.id), "danger" ) }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container border border-primary-subtle rounded">
+        <div class="h6 m-3 text-center">No pending doctor validations</div>
+    </div>
+    {% endif %}
+
+{% endblock %}
