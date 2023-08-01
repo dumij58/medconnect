@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="h1">{% block title %}Log{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-2 mb-4 border border-primary-subtle rounded">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Created</th>
+                <th scope="col">User</th>
+                <th scope="col">Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if log %}
+            {% for item in log | reverse %}
+                <tr>
+                    <th scope="row">{{ item.id }}</th>
+                    <td>{{ item.created | datetime }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>{{ item.remarks }}</td>
+                </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

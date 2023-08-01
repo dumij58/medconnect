@@ -32,12 +32,12 @@
                         {{ render_modal(
                             "verifyModal" + str(row.id), "Are you sure?", 
                             "This action adds " ~ row.username ~ " to the database", 
-                            "Validate", url_for('main.doc_validate', doc_id = row.id), "primary" ) }}
+                            "Validate", url_for('admin.doc_validate', doc_id = row.id), "primary" ) }}
                         <button type="button" class="m-2 btn btn-danger" data-bs-toggle="modal" data-bs-target="#denyModal{{ row.id }}">Reject</button>
                         {{ render_modal(
                             "denyModal" + str(row.id), "Are you sure?", 
                             "This action rejects " ~ row.username ~ "'s registration and deletes the data from the database", 
-                            "Reject", url_for('main.doc_reject', doc_id = row.id), "danger" ) }}
+                            "Reject", url_for('admin.doc_reject', doc_id = row.id), "danger" ) }}
                     </div>
                 </div>
             </div>
@@ -50,5 +50,34 @@
         <div class="h6 m-3 text-center">No pending doctor validations</div>
     </div>
     {% endif %}
+
+    <div class="h3 mb-3 mt-5 text-center">Log</div>
+    <div class="container p-3 border border-primary-subtle rounded">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if log %}
+                {% for i in range(log_len - 5, log_len, 1) | reverse %}
+                    <tr>
+                        <th scope="row">{{ log[i].id }}</th>
+                        <td>{{ log[i].created | datetime }}</td>
+                        <td>{{ log[i].user }}</td>
+                        <td>{{ log[i].remarks }}</td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+        <div class="d-grid gap-2">
+            <a class="btn btn-primary" href="{{ url_for('admin.log') }}">Show Full Log</a>
+        </div>
+    </div>
 
 {% endblock %}

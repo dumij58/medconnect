@@ -18,10 +18,10 @@
             {% if g.user %}
               {% if user_type == 'admin' %}
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="{{ url_for('main.admin_dash') }}">Dashboard</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('admin.dash') }}">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Log</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('admin.log') }}">Log</a>
               </li>
               {% else %}
               <li class="nav-item">
