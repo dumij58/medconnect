@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Integer, Date, Numeric, DateTime
+from sqlalchemy import Column, Text, Integer, Date, Numeric, DateTime
 
 from . import db
 
@@ -77,6 +77,7 @@ class Log(db.Model):
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime(timezone=False), nullable=False)
+    user = Column(Text)
     remarks = Column(Text, nullable=False)
 
     def __repr__(self):

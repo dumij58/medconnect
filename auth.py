@@ -1,18 +1,21 @@
-import functools
-
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, current_app
+    Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for
 )
-from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime, timezone
+from werkzeug.security import generate_password_hash
+from datetime import datetime
 
-from .models import db, Patient, Doctor, DoctorPreVal, Admin
+from .helpers import login_required
+from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log
 from .forms import PtRegForm, DocRegForm, LoginForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register/pt', methods=('GET', 'POST'))
 def register():
+    # Ensure user is not logged in
+    if g.user is not None:
+        return redirect(url_for('index'))
+    
     # Initialize registration form
     form = PtRegForm()
 
@@ -35,6 +38,16 @@ def register():
         )
         ## Add records to database and commit all changes
         db.session.add(new_patient)
+
+        # Append a remark to log
+        append = Log(
+            created = datetime.now(),
+            user = Patient.query.filter(Patient.username == form.username.data).first().username,
+            remarks = f"Patient ({form.username.data}) added to DB"
+        )
+        db.session.add(append)
+
+        # Commit all changes to database
         db.session.commit()
         
         # Flash a message and redirect to login page
@@ -47,13 +60,17 @@ def register():
 
 @bp.route('/register/doc', methods=('GET', 'POST'))
 def doc_register():
+    # Ensure user is not logged in
+    if g.user is not None:
+        return redirect(url_for('index'))
+
     # Initialize registration form
     form = DocRegForm()
 
     # Ensure data is validated on submit
     if request.method == 'POST' and form.validate():
         
-        # Update database
+        # Add doctor data to pending validations table
         new_doctor = DoctorPreVal(
             username = str(form.username.data).lower(),
             hash = generate_password_hash(form.password.data),
@@ -66,8 +83,17 @@ def doc_register():
             specialities = form.specialities.data,
             created = datetime.now()
         )
-        ## Add records to database and commit all changes
         db.session.add(new_doctor)
+
+        # Append a remark to Log
+        append = Log(
+            created = datetime.now(),
+            user = DoctorPreVal.query.filter(DoctorPreVal.username == form.username.data).first().username,
+            remarks = f"Doctor ({form.username.data}) data added to pending validations list"
+        )
+        db.session.add(append)
+
+        # Commit all changes to database
         db.session.commit()
         
         # Flash a message and redirect to login page
@@ -81,6 +107,10 @@ def doc_register():
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    # Ensure user is not logged in
+    if g.user is not None:
+        return redirect(url_for('index'))
+
     # Initialize login form
     form = LoginForm(request.form)
 
@@ -99,10 +129,24 @@ def login():
         elif admin:
             flask_session['user_type'] = "admin"
             flask_session['user_id'] = admin.id
-            flash('Welcome Admin!', 'success')
-            return redirect(url_for('main.admin_dash'))
+        
+        # Append a remark to log
+        append = Log(
+            created = datetime.now(),
+            user = form.username.data,
+            remarks = f"{flask_session.get('user_type').capitalize()} ({form.username.data}) logged in"
+        )
+        db.session.add(append)
+        db.session.commit()
+        
         
         flash('Login successful!', 'success')
+
+        # Redirect admins to dashboard
+        if admin:
+            return redirect(url_for('admin.dash'))
+        
+        # Redirect other users to index
         return redirect(url_for('index'))
     
     return render_template('auth/login.html', form = form)
@@ -129,6 +173,7 @@ def user_type_acp():
 
 
 @bp.route('/logout')
+@login_required
 def logout():
     flask_session.clear()
     return redirect(url_for('index'))
@@ -136,6 +181,7 @@ def logout():
 
 """ This is used to add an admin into the database """
 @bp.route('/register/41646d696e526567', methods=('GET', 'POST'))
+# @admin_only
 def admin_register():
     # Ensure data is validated on submit
     if request.method == 'POST':

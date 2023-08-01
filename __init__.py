@@ -1,7 +1,7 @@
 import os
-import secrets
+# import secrets
 
-from flask import Flask, g
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -32,13 +32,15 @@ def create_app():
         db.create_all()
 
     # Import and register blueprints
-    from . import auth
+    from . import auth, admin, main 
     app.register_blueprint(auth.bp)
-
-    from . import main
+    app.register_blueprint(admin.bp)
     app.register_blueprint(main.bp)
+
+    # Config url rules
     app.add_url_rule('/', endpoint='index')
 
+    # Set up env filters
     from . import helpers
     app.jinja_env.filters['phone_no'] = helpers.f_phone_no
     app.jinja_env.filters['gender'] = helpers.f_gender

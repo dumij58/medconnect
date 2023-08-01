@@ -1,6 +1,6 @@
 import functools
 
-from flask import redirect, url_for, render_template, g, session as flask_session
+from flask import redirect, url_for, render_template, g
 from .models import Admin
 
 def login_required(view):
@@ -15,6 +15,7 @@ def login_required(view):
 
 
 def admin_only(view):
+    @login_required
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if not Admin.query.filter(Admin.username == g.user.username).first():
