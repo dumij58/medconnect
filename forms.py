@@ -3,7 +3,7 @@ from wtforms import IntegerField, StringField, PasswordField, DateField, EmailFi
 from wtforms.validators import Length, EqualTo, Email, ValidationError
 from werkzeug.security import check_password_hash
 
-from .models import db, Patient, Doctor
+from .models import db, Patient, Doctor, Admin
 
 def data_required(form, field):
     if not field.data:
@@ -105,7 +105,9 @@ class DocRegForm(FlaskForm):
                 
 
 def check_uname(form, field):
-    if Patient.query.filter(Patient.username == field.data).first() or Doctor.query.filter(Doctor.username == field.data).first():
+    if Patient.query.filter(Patient.username == field.data).first() or \
+    Doctor.query.filter(Doctor.username == field.data).first() or \
+    Admin.query.filter(Admin.username == field.data).first():
         return
     else:
         raise ValidationError(message=f"User {field.data} doesn't exist.")
@@ -114,11 +116,15 @@ def check_uname(form, field):
 def check_pass(form, field):
     pt = Patient.query.filter(Patient.username == form.username.data).first()
     doc = Doctor.query.filter(Doctor.username == form.username.data).first()
+    admin = Admin.query.filter(Admin.username == form.username.data).first()
     if pt:
         if not check_password_hash(pt.hash, form.password.data):
             raise ValidationError(message="Incorrect password.")
     elif doc:
         if not check_password_hash(doc.hash, form.password.data):
+            raise ValidationError(message="Incorrect password.")
+    elif admin:
+        if not check_password_hash(admin.hash, form.password.data):
             raise ValidationError(message="Incorrect password.")
 
 

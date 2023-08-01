@@ -6,7 +6,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timezone
 
-from .models import db, Patient, Doctor
+from .models import db, Patient, Doctor, DoctorPreVal, Admin
 from .forms import PtRegForm, DocRegForm, LoginForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -54,7 +54,7 @@ def doc_register():
     if request.method == 'POST' and form.validate():
         
         # Update database
-        new_doctor = Doctor(
+        new_doctor = DoctorPreVal(
             username = str(form.username.data).lower(),
             hash = generate_password_hash(form.password.data),
             full_name = form.full_name.data,
@@ -85,16 +85,22 @@ def login():
     form = LoginForm(request.form)
 
     if request.method == 'POST' and form.validate():
-
+        # Clear flask session and add corresponding id of user into flask session
         flask_session.clear()
         pt = Patient.query.filter(Patient.username == form.username.data).first()
         doc = Doctor.query.filter(Doctor.username == form.username.data).first()
+        admin = Admin.query.filter(Admin.username == form.username.data).first()
         if pt:
             flask_session['user_type'] = "patient"
             flask_session['user_id'] = pt.id
         elif doc:
             flask_session['user_type'] = "doctor"
             flask_session['user_id'] = doc.id
+        elif admin:
+            flask_session['user_type'] = "admin"
+            flask_session['user_id'] = admin.id
+            flash('Welcome Admin!', 'success')
+            return redirect(url_for('main.admin_dash'))
         
         flash('Login successful!', 'success')
         return redirect(url_for('index'))
@@ -113,6 +119,13 @@ def load_logged_in_user():
         g.user = Patient.query.filter(Patient.id == user_id).first()
     elif user_type == 'doctor':
         g.user = Doctor.query.filter(Doctor.id == user_id).first()
+    elif user_type == 'admin':
+        g.user = Admin.query.filter(Admin.id == user_id).first()
+
+
+@bp.app_context_processor
+def user_type_acp():
+    return dict(user_type = flask_session.get('user_type'))
 
 
 @bp.route('/logout')
@@ -121,13 +134,26 @@ def logout():
     return redirect(url_for('index'))
 
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-
-        return view(**kwargs)
-
-    return wrapped_view
+""" This is used to add an admin into the database """
+@bp.route('/register/41646d696e526567', methods=('GET', 'POST'))
+def admin_register():
+    # Ensure data is validated on submit
+    if request.method == 'POST':
+        
+        # Update database
+        new_admin = Admin(
+            username = request.form.get('username'),
+            hash = generate_password_hash(request.form.get('password')),
+            identification_no = request.form.get('id_no')
+        )
+        ## Add records to database and commit all changes
+        db.session.add(new_admin)
+        db.session.commit()
+        
+        # Flash a message and redirect to login page
+        flash('Admin Added', "success")
+        return redirect(url_for('auth.login'))
+    
+    # Render the registration form
+    return render_template('auth/admin_register.html')
     

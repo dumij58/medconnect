@@ -39,4 +39,10 @@ def create_app():
     app.register_blueprint(main.bp)
     app.add_url_rule('/', endpoint='index')
 
+    from . import helpers
+    app.jinja_env.filters['phone_no'] = helpers.f_phone_no
+    app.jinja_env.filters['gender'] = helpers.f_gender
+    app.jinja_env.filters['datetime'] = helpers.f_datetime
+    app.jinja_env.filters['date'] = helpers.f_date
+
     return app

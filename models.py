@@ -36,9 +36,28 @@ class Doctor(db.Model):
     reg_no = Column(Integer, unique=True, nullable=False)
     hash = Column(Text, nullable=False)
     created = Column(DateTime(timezone=False), nullable=False)
+    validated = Column(DateTime(timezone=False), nullable=False)
 
     def __repr__(self):
-        return f'<Patient {self.username}>'
+        return f'<Doctor {self.username}>'
+    
+class DoctorPreVal(db.Model):
+    """ Data model to store doctor data until validation """
+
+    id = Column(Integer, primary_key=True)
+    username = Column(Text, unique=True, nullable=False)
+    full_name = Column(Text, nullable=False)
+    gender = Column(Text, nullable=False)
+    dob = Column(Date, nullable=False)
+    contact = Column(Numeric, nullable=False)
+    email = Column(Text, unique=True, nullable=False)
+    specialities = Column(Text, nullable=True)
+    reg_no = Column(Integer, unique=True, nullable=False)
+    hash = Column(Text, nullable=False)
+    created = Column(DateTime(timezone=False), nullable=False)
+
+    def __repr__(self):
+        return f'<PatientPreVal {self.id}>'
     
 
 class Admin(db.Model):
@@ -50,4 +69,15 @@ class Admin(db.Model):
     hash = Column(Text, nullable=False)
 
     def __repr__(self):
-        return f'<Patient {self.username}>'
+        return f'<Admin {self.username}>'
+    
+
+class Log(db.Model):
+    """ Data model for logs """
+
+    id = Column(Integer, primary_key=True, index=True)
+    created = Column(DateTime(timezone=False), nullable=False)
+    remarks = Column(Text, nullable=False)
+
+    def __repr__(self):
+        return f'<Log {self.id}>'
