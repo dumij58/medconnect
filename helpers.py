@@ -1,7 +1,8 @@
 import functools
 
 from flask import redirect, url_for, render_template, g
-from .models import Admin
+from .models import Admin, Hospital
+from .forms import SessionForm
 
 def login_required(view):
     @functools.wraps(view)
@@ -24,6 +25,12 @@ def admin_only(view):
         return view(**kwargs)
 
     return wrapped_view
+
+
+def select_hospital(request, id):
+    hospital = None
+    form = SessionForm(request.POST, obj = hospital)
+    form.hl_id.choices = [ (hl.id, hl.name) for hl in Hospital.query.order_by('name') ]
 
 
 def f_phone_no(number):

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, Integer, Date, Numeric, DateTime
+from sqlalchemy import Column, Text, Integer, Date, Time, Numeric, DateTime, Boolean, ForeignKey
 
 from . import db
 
@@ -57,7 +57,46 @@ class DoctorPreVal(db.Model):
     created = Column(DateTime(timezone=False), nullable=False)
 
     def __repr__(self):
-        return f'<PatientPreVal {self.id}>'
+        return f'<DoctorPreVal {self.id}>'
+    
+
+class Appointment(db.Model):
+    """ Data model to store appointments """
+
+    id = Column(Integer, primary_key=True, index=True)
+    datetime = Column(DateTime, unique=True, nullable=False)
+    dr_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)  ## Change dr_id to doc_id for consistancy
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    hl_id = Column(Integer, ForeignKey('hospital.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Appointment {self.id}>'
+    
+
+class DocSession(db.Model):
+    """ Data model to store doctor available time """
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    start_t = Column(Time, nullable=False)
+    end_t = Column(Time, nullable=False)
+    doc_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)
+    hl_id = Column(Integer, ForeignKey('hospital.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<DocSession {self.id}>'
+
+
+class Hospital(db.Model):
+    """ Data model for hospitals """
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(Text, unique=True, nullable=False)
+    address = Column(Text, nullable=False)
+    contact = Column(Numeric, nullable=False)
+
+    def __repr__(self):
+        return f'<Hospital {self.id}>'
     
 
 class Admin(db.Model):

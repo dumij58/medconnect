@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Sessions{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
+    <div class="text-center">
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary float-end" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+              Add Session
+            </button>
+            {% from "_formhelpers.html" import render_field %}
+            <form method="post" action="{{ url_for('doc.add_session') }}" class="dropdown-menu dropdown-menu-end p-4" style="width: 18rem;">
+                {{ form.csrf_token }}
+                <dl>
+                    {{ render_field(form.hl_id, class="form-control", autocomplete="off") }}
+                    {{ render_field(form.date, class="form-control") }}
+                    {{ render_field(form.start_t, class="form-control") }}
+                    {{ render_field(form.end_t, class="form-control") }}
+                </dl>
+                {{ form.submit(class="btn btn-primary my-3") }}
+            </form>
+        <p class="fs-3">Available Time</p>
+    </div>
+    <div class="p-3 border rounded">
+        {% if sessions %}
+        {% for item in sessions %}
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <a href="#" class="btn-close float-end" aria-label="Close"></a>
+                <p class="fs-5 card-title">{{ item.date }}</h5>
+                <p class="card-text">{{ item.start_t }} - {{ item.end_t }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="fs-6 text-center text-break text-secondary">No available time</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

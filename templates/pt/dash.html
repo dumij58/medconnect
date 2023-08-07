@@ -3,7 +3,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
+<div class="container-md p-3 mb-4 bg-body-secondary rounded">
     <div class="row m-1 align-items-center">
         <div class="col ms-4">
             <div class="fs-5 text-tertiary-emphasis text-break">{{ g.user.full_name }}</div>
@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<div class="container-md p-3 mb-4 bg-body-secondary rounded">
+<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
     <div class="fs-4 mb-2 text-center">Upcoming Appointments</div>
     {% if not list %}
     <div class="fs-6 text-center text-break text-secondary">No upcoming appointments</div>
@@ -27,7 +27,7 @@
     {% endif %}
 </div>
 
-<div class="container-md p-3 mb-4 bg-body-secondary rounded">
+<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
     <div class="fs-4 mb-2 text-center">Recent Medical Records</div>
     {% if not records %}
     <div class="fs-6 text-center text-break text-secondary">No recent medical records</div>

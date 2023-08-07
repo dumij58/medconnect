@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, PasswordField, DateField, EmailField, SubmitField, TelField, SelectField, TextAreaField
+from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField
 from wtforms.validators import Length, EqualTo, Email, ValidationError
 from werkzeug.security import check_password_hash
 
-from .models import db, Patient, Doctor, Admin
+from .models import db, Patient, Doctor, Admin, Hospital
 
 def data_required(form, field):
     if not field.data:
@@ -139,3 +139,11 @@ class LoginForm(FlaskForm):
         check_pass
     ])
     submit = SubmitField('Log In')
+
+
+class SessionForm(FlaskForm):
+    hl_id = SelectField('Hospital', [data_required], coerce=int)
+    date = DateField('Date', [data_required])
+    start_t = TimeField('Start', [data_required])
+    end_t = TimeField('End', [data_required])
+    submit = SubmitField('Add')
