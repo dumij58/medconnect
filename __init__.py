@@ -32,10 +32,12 @@ def create_app():
         db.create_all()
 
     # Import and register blueprints
-    from . import auth, admin, main 
+    from . import auth, admin, main, doc, pt
     app.register_blueprint(auth.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(main.bp)
+    app.register_blueprint(doc.bp)
+    app.register_blueprint(pt.bp)
 
     # Config url rules
     app.add_url_rule('/', endpoint='index')

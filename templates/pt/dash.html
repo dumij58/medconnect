@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
+    <div class="row m-1 align-items-center">
+        <div class="col ms-4">
+            <div class="fs-5 text-tertiary-emphasis text-break">{{ g.user.full_name }}</div>
+            <div class="fs-6 text-secondary">@{{ g.user.username }}</div>
+        </div>
+        <div class="col-3 text-center">
+            <a class="btn btn-primary" href="#">Go to Profile</a>
+        </div>
+    </div>
+</div>
+
+<div class="container-md p-3 mb-4 bg-body-secondary rounded">
+    <div class="fs-4 mb-2 text-center">Upcoming Appointments</div>
+    {% if not list %}
+    <div class="fs-6 text-center text-break text-secondary">No upcoming appointments</div>
+    {% else %}
+    <div class="scroll-box">
+        Appointments
+        <!-- add list of appointments here -->
+    </div>
+    {% endif %}
+</div>
+
+<div class="container-md p-3 mb-4 bg-body-secondary rounded">
+    <div class="fs-4 mb-2 text-center">Recent Medical Records</div>
+    {% if not records %}
+    <div class="fs-6 text-center text-break text-secondary">No recent medical records</div>
+    {% else %}
+    <div class="scroll-box">
+        Records
+        <!-- add list of appointments here -->
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

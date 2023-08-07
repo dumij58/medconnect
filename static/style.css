@@ -2,3 +2,8 @@
     max-height: 20rem; 
     overflow-y: scroll;
 }
+
+.scroll-box {
+    max-height: 30rem; 
+    overflow-y: scroll;
+}

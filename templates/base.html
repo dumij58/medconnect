@@ -23,23 +23,25 @@
               <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="{{ url_for('admin.log') }}">Log</a>
               </li>
+              {% elif user_type == 'doctor' %}
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{{ url_for('doc.dash') }}">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#">Appointments</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#">Patients</a>
+              </li>
               {% else %}
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Home</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('pt.dash') }}">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
+                <a class="nav-link" aria-current="page" href="#">Appointments</a>
               </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Action</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#">Records</a>
               </li>
               {% endif %}
             {% endif %}
@@ -67,7 +69,7 @@
 
   <section class="content">
 
-    <!-- Use flash messages with categories to display different colors of flash messages (using Bootstrap colors) -->
+    <!-- Use flash messages with categories to display different colors of flash messages (using Bootstrap colors [success, danger, info, primary, secondary,...] ) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
