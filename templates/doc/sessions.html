@@ -6,11 +6,14 @@
 <div class="container-md p-3 mb-4 bg-body-tertiary rounded">
     <div class="text-center">
         <div class="dropdown">
-            <button type="button" class="btn btn-primary float-end" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+            <button type="button" id="showFormBtn" class="btn btn-primary float-end{% if show %} show{% endif %}" data-bs-toggle="dropdown" aria-expanded="{% if show %}true{% else %}false{% endif %}" data-bs-auto-close="outside">
               Add Session
             </button>
             {% from "_formhelpers.html" import render_field %}
-            <form method="post" action="{{ url_for('doc.add_session') }}" class="dropdown-menu dropdown-menu-end p-4" style="width: 18rem;">
+            <form method="post" action="{{ url_for('doc.sessions') }}" id="sessionForm" class="dropdown-menu dropdown-menu-end p-4{% if show %} show{% endif %}" 
+                {% if show %} style="width: 18rem; position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate3d(0px, 39.5px, 0px);" 
+                {% else %} style="width: 18rem;"{% endif %}>
+            
                 {{ form.csrf_token }}
                 <dl>
                     {{ render_field(form.hl_id, class="form-control", autocomplete="off") }}
@@ -24,15 +27,27 @@
     </div>
     <div class="p-3 border rounded">
         {% if sessions %}
+        <div class="row">
         {% for item in sessions %}
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <a href="#" class="btn-close float-end" aria-label="Close"></a>
-                <p class="fs-5 card-title">{{ item.date }}</h5>
-                <p class="card-text">{{ item.start_t }} - {{ item.end_t }}</p>
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-3 mb-sm-0">
+            <div class="card my-1">
+                <div class="card-body">
+                    <button type="button" class="btn-close float-end" data-bs-toggle="modal" data-bs-target="#delSessionModal{{ item.id }}"></button>
+                        {% from "_modalhelpers.html" import render_modal %}
+                        {{ render_modal(
+                            "delSessionModal" + str(item.id), "Are you sure?", 
+                            "This action removes session " ~ item.date ~ " (" ~ item.start_t | noSeconds ~ " to " ~ item.end_t | noSeconds ~ ") from the database",
+                            "Remove", url_for('doc.session_remove', s_id = item.id), "danger" ) }}
+                    <p class="fs-5 card-title text-start">{{ item.hl_id | hospital }}</h5>
+                    <p class="card-text">
+                        {{ item.date }}<br>
+                        {{ item.start_t | noSeconds }} - {{ item.end_t | noSeconds }}
+                    </p>
+                </div>
             </div>
         </div>
         {% endfor %}
+        </div>
         {% else %}
         <div class="fs-6 text-center text-break text-secondary">No available time</div>
         {% endif %}

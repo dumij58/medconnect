@@ -42,8 +42,18 @@ def f_gender(gender):
     if gender == "m":
         return "Male"
     
+def f_hospital(hl_id):
+    hl = Hospital.query.filter(Hospital.id == hl_id).first()
+    return hl.name
+    
 def f_datetime(dt):
     return '{:%Y-%m-%d %H:%M:%S}'.format(dt)
 
 def f_date(d):
     return '{:%Y-%m-%d}'.format(d)
+
+def f_time(t):
+    return '{:%H:%M:%S}'.format(t)
+
+def f_timeNoS(t):
+    return '{:%H:%M}'.format(t)

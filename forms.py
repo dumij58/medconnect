@@ -40,6 +40,12 @@ def check_user(form, field):
         raise ValidationError(message=f"User {uname} already exist.")
 
 
+def check_gender(form, field):
+    gender = field.data
+    if gender != 'm' or gender != 'f':
+        raise ValidationError(message=f"Select a valid gender")
+
+
 class PtRegForm(FlaskForm):
     # Account creation details
     username = StringField('Username', [
@@ -54,7 +60,10 @@ class PtRegForm(FlaskForm):
     ])
     # Personal information
     full_name = StringField('Full Name', [data_required])
-    gender = SelectField('Gender', [data_required], choices=[('','Select Your Gender'),('m','Male'),('f','Female')])
+    gender = SelectField('Gender', [
+        data_required,
+        check_gender
+    ], choices=[('','Select Your Gender'),('m','Male'),('f','Female')])
     dob = DateField('Date of Birth', [data_required])
     address = StringField('Address', [data_required])
     email = EmailField('Email Address', [
@@ -88,7 +97,10 @@ class DocRegForm(FlaskForm):
     ])
     # Personal information
     full_name = StringField('Full Name', [data_required])
-    gender = SelectField('Gender', [data_required], choices=[('','Not Specified'),('m','Male'),('f','Female')])
+    gender = SelectField('Gender', [
+        data_required,
+        check_gender
+    ], choices=[('','Not Specified'),('m','Male'),('f','Female')])
     dob = DateField('Date of Birth', [data_required])
     email = EmailField('Email Address', [
         data_required,
@@ -141,20 +153,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log In')
 
 
-class SessionForm(FlaskForm):
-    hl_id = SelectField('Hospital', [data_required], coerce=int)
-    date = DateField('Date', [data_required])
-    start_t = TimeField('Start', [data_required])
-    end_t = TimeField('End', [data_required])
-    submit = SubmitField('Add')
-
-
 def check_hospital(form, field):
     name = form.name.data
     if Hospital.query.filter(Hospital.name == name).first():
         raise ValidationError(message=f"Hospital ({name}) already exist.")
     
-    
+
 class HlRegForm(FlaskForm):
     name = StringField('Name', [
         data_required,
@@ -167,4 +171,12 @@ class HlRegForm(FlaskForm):
         length(min=6, max=35)
     ])
     contact = TelField('Contact No.', [data_required])
+    submit = SubmitField('Add')
+
+    
+class SessionForm(FlaskForm):
+    hl_id = SelectField('Hospital', [data_required,], coerce=int)
+    date = DateField('Date', [data_required])
+    start_t = TimeField('Start', [data_required])
+    end_t = TimeField('End', [data_required])
     submit = SubmitField('Add')
