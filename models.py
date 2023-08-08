@@ -93,6 +93,7 @@ class Hospital(db.Model):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(Text, unique=True, nullable=False)
     address = Column(Text, nullable=False)
+    email = Column(Text, nullable=False)
     contact = Column(Numeric, nullable=False)
 
     def __repr__(self):

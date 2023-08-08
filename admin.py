@@ -6,11 +6,12 @@ from markupsafe import escape
 from datetime import datetime
 
 from .helpers import admin_only
-from .models import db, DoctorPreVal, Doctor, Log
+from .models import db, DoctorPreVal, Doctor, Log, Hospital, Admin
+from .forms import HlRegForm
 
 bp = Blueprint('admin', __name__, url_prefix='/61646d696e')
 
-@bp.route('/64617368', methods=('GET', 'POST'))
+@bp.route('/64617368')
 @admin_only
 def dash():
     docprevaldata = DoctorPreVal.query.all()
@@ -87,6 +88,74 @@ def doc_reject(doc_id):
 
     flash("Doctor registration rejected", 'info')
     return redirect(url_for('admin.dash'))
+
+
+@bp.route('/686f73706974616c73', methods=('GET', 'POST'))
+@admin_only
+def hospitals():
+    # Initialize form
+    form = HlRegForm()
+    showForm = False
+
+    # Ensure data is validated on submit
+    if request.method == 'POST':
+        if form.validate():
+
+            # Add records to database
+            new_hospital = Hospital(
+                name = form.name.data,
+                email = form.email.data,
+                contact = form.contact.data,
+                address = form.address.data
+            )
+            db.session.add(new_hospital)
+
+            # Append a remark to log
+            append = Log(
+                created = datetime.now(),
+                user = g.user.username,
+                remarks = f"Hospital ({form.name.data}) added to DB"
+            )
+            db.session.add(append)
+
+            # Commit all changes to database
+            db.session.commit()
+            
+            # Flash a message and redirect to login page
+            showForm = False
+            flash('Hospital Added!', "success")
+    
+        else:
+            showForm = True
+
+    hospitals = Hospital.query.all()
+    return render_template('/admin/hospitals.html', show = showForm, form = form, hospitals = hospitals)
+
+
+@bp.route('/686f73706974616c73/<int:hl_id>')
+@admin_only
+def hl_remove(hl_id):
+    hospital = Hospital.query.filter(Hospital.id == escape(hl_id)).first()
+
+    # Append a remark to log
+    append = Log(
+            created = datetime.now(),
+            user = g.user.username,
+            remarks = f"Admin ({g.user.username}) removed hospital ({hospital.name}) from datatbase"
+        )
+    db.session.add(append)
+
+    flash(f'Hospital ({hospital.name}) removed!','info')
+    
+    # Delete the hospital data
+    db.session.delete(hospital)
+
+    # Commit changes into the database
+    db.session.commit()
+
+    ### todo: Send an email to hospital ###
+
+    return redirect(url_for('admin.hospitals'))
 
 
 @bp.route('/6c6f67')

@@ -21,6 +21,12 @@
                 <a class="nav-link" aria-current="page" href="{{ url_for('admin.dash') }}">Dashboard</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{{ url_for('admin.hospitals') }}">Hospitals</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#">Messages</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="{{ url_for('admin.log') }}">Log</a>
               </li>
               {% elif user_type == 'doctor' %}

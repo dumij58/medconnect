@@ -147,3 +147,24 @@ class SessionForm(FlaskForm):
     start_t = TimeField('Start', [data_required])
     end_t = TimeField('End', [data_required])
     submit = SubmitField('Add')
+
+
+def check_hospital(form, field):
+    name = form.name.data
+    if Hospital.query.filter(Hospital.name == name).first():
+        raise ValidationError(message=f"Hospital ({name}) already exist.")
+    
+    
+class HlRegForm(FlaskForm):
+    name = StringField('Name', [
+        data_required,
+        check_hospital
+    ])
+    address = TextAreaField('Address', [data_required])
+    email = EmailField('Email', [
+        data_required,
+        Email(),
+        length(min=6, max=35)
+    ])
+    contact = TelField('Contact No.', [data_required])
+    submit = SubmitField('Add')

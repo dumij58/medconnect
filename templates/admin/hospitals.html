@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<div class="h1">{% block title %}Hospitals{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-2 border border-primary-subtle rounded">
+    <p class="d-flex justify-content-end pt-2">
+            <a class="btn btn-primary mx-1" data-bs-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseForm">Add Hospital</a>
+            <button id="showDeleteButtons" class="btn btn-danger mx-1">Remove Hospital</button>
+    </p>
+    <div class="collapse {% if show %}show{% endif %}" id="collapseForm">
+        <div class="card card-body">
+            {% from "_formhelpers.html" import render_field %}
+            <form method="post" action="{{ url_for('admin.hospitals') }}" class="p-4">
+                {{ form.csrf_token }}
+                <dl>
+                    {{ render_field(form.name, class="form-control", autocomplete="off") }}
+                    {{ render_field(form.address, class="form-control") }}
+                    <div class="row">
+                        <div class="col">
+                            {{ render_field(form.email, class="form-control") }}
+                        </div>
+                        <div class="col">
+                            {{ render_field(form.contact, class="form-control") }}
+                        </div>
+                    </div>
+                </dl>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive-md">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Hospital</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if hospitals %}
+                {% for item in hospitals %}
+                <tr>
+                    <th scope="row">{{ item.id }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.address }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.contact | phone_no }}</td>
+                    <td>
+                        <button type="button" class="btn-close float-end delete-btn" data-bs-toggle="modal" data-bs-target="#confirmModal{{ item.id }}"></button>
+                        {% from "_modalhelpers.html" import render_modal %}
+                        {{ render_modal(
+                            "confirmModal" + str(item.id), "Are you sure?", 
+                            "This action removes " ~ item.name ~ " from the database",
+                            "Remove", url_for('admin.hl_remove', hl_id = item.id), "danger" ) }}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <div class="fs-6 text-center text-break text-secondary">No hospitals in database</div>
+                {% endif %}
+            </tbody>
+        </table>
+        <script src="{{ url_for('static', filename='/js/show-delete-btn.js') }}"></script>
+    </div>
+</div>
+{% endblock %}
