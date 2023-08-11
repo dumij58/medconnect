@@ -23,7 +23,7 @@
                 </dl>
                 {{ form.submit(class="btn btn-primary my-3") }}
             </form>
-        <p class="fs-3">Available Time</p>
+        <p class="fs-3">Sessions</p>
     </div>
     <div class="p-3 border rounded">
         {% if sessions %}
@@ -32,16 +32,16 @@
         <div class="col-lg-3 col-md-4 col-sm-6 mb-3 mb-sm-0">
             <div class="card my-1">
                 <div class="card-body">
-                    <button type="button" class="btn-close float-end" data-bs-toggle="modal" data-bs-target="#delSessionModal{{ item.id }}"></button>
+                    <button type="button" class="btn-close float-end" data-bs-toggle="modal" data-bs-target="#delSessionModal{{ item.DocSession.id }}"></button>
                         {% from "_modalhelpers.html" import render_modal %}
                         {{ render_modal(
-                            "delSessionModal" + str(item.id), "Are you sure?", 
-                            "This action removes session " ~ item.date ~ " (" ~ item.start_t | noSeconds ~ " to " ~ item.end_t | noSeconds ~ ") from the database",
-                            "Remove", url_for('doc.session_remove', s_id = item.id), "danger" ) }}
-                    <p class="fs-5 card-title text-start">{{ item.hl_id | hospital }}</h5>
+                            "delSessionModal" + str(item.DocSession.id), "Are you sure?", 
+                            "This action removes session " ~ item.DocSession.date ~ " (" ~ item.DocSession.start_t | noSeconds ~ " to " ~ item.DocSession.end_t | noSeconds ~ ") from the database",
+                            "Remove", url_for('doc.session_remove', s_id = item.DocSession.id), "danger" ) }}
+                    <p class="fs-5 card-title text-start">{{ item.DocSession.date }}</h5>
                     <p class="card-text">
-                        {{ item.date }}<br>
-                        {{ item.start_t | noSeconds }} - {{ item.end_t | noSeconds }}
+                        {{ item.Hospital.name }}<br>
+                        {{ item.DocSession.start_t | noSeconds }} - {{ item.DocSession.end_t | noSeconds }}
                     </p>
                 </div>
             </div>

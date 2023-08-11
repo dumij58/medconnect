@@ -46,10 +46,13 @@ def create_app():
     from . import helpers
     app.jinja_env.filters['phone_no'] = helpers.f_phone_no
     app.jinja_env.filters['gender'] = helpers.f_gender
-    app.jinja_env.filters['hospital'] = helpers.f_hospital
+    app.jinja_env.filters['age'] = helpers.f_age
+    app.jinja_env.filters['dr'] = helpers.f_dr
     app.jinja_env.filters['datetime'] = helpers.f_datetime
+    app.jinja_env.filters['dtNoS'] = helpers.f_dtNoS
+    app.jinja_env.filters['dtNoSwDay'] = helpers.f_dtNoS_wDay
     app.jinja_env.filters['date'] = helpers.f_date
     app.jinja_env.filters['time'] = helpers.f_time
     app.jinja_env.filters['noSeconds'] = helpers.f_timeNoS
-
+    app.jinja_env.filters['mins'] = helpers.f_mins
     return app

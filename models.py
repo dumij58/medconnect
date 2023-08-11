@@ -65,9 +65,10 @@ class Appointment(db.Model):
 
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, unique=True, nullable=False)
-    dr_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)  ## Change dr_id to doc_id for consistancy
+    doc_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)
     pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
     hl_id = Column(Integer, ForeignKey('hospital.id'), nullable=False)
+    s_id = Column(Integer, ForeignKey('doc_session.id'), nullable=False)
 
     def __repr__(self):
         return f'<Appointment {self.id}>'

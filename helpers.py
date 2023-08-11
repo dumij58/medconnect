@@ -1,7 +1,9 @@
 import functools
 
 from flask import redirect, url_for, render_template, g
-from .models import Admin, Hospital
+from datetime import datetime, date
+
+from .models import db, Admin, Hospital, Doctor, DocSession
 from .forms import SessionForm
 
 def login_required(view):
@@ -33,6 +35,21 @@ def select_hospital(request, id):
     form.hl_id.choices = [ (hl.id, hl.name) for hl in Hospital.query.order_by('name') ]
 
 
+def get_total_apmts(s_id):
+    s = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.id == s_id)).first()
+
+    # Combine doc session date with start and end times 
+    # (datetime's time objects can't calculate a timedelta, but datetime and date objects can)
+    date = s.DocSession.date
+    start_dt = datetime.combine(date, s.DocSession.start_t)
+    end_dt = datetime.combine(date, s.DocSession.end_t)
+    
+    # Get total appointments for a session (if each appointment is 20 minutes)
+    total = int((abs(end_dt - start_dt).total_seconds() // 60) // 20)
+
+    return total
+
+
 def f_phone_no(number):
     return f"+{str(int(number))}"
 
@@ -41,19 +58,31 @@ def f_gender(gender):
         return "Female"
     if gender == "m":
         return "Male"
-    
-def f_hospital(hl_id):
-    hl = Hospital.query.filter(Hospital.id == hl_id).first()
-    return hl.name
+
+def f_dr(doc):
+    return f"Dr. {doc}"
+
+def f_age(dob):
+    age = int(abs(date.today() - dob).days) // 365
+    return age
     
 def f_datetime(dt):
-    return '{:%Y-%m-%d %H:%M:%S}'.format(dt)
+    return '{:%Y-%m-%d %H:%M:%S %p}'.format(dt)
+
+def f_dtNoS(dt):
+    return '{:%Y-%m-%d %I:%M %p}'.format(dt)
+
+def f_dtNoS_wDay(dt):
+    return '{:%Y-%m-%d - %a %I:%M %p}'.format(dt)
 
 def f_date(d):
     return '{:%Y-%m-%d}'.format(d)
 
 def f_time(t):
-    return '{:%H:%M:%S}'.format(t)
+    return '{:%I:%M:%S %p}'.format(t)
 
 def f_timeNoS(t):
-    return '{:%H:%M}'.format(t)
+    return '{:%I:%M %p}'.format(t)
+
+def f_mins(td):
+    return '{:%M}'.format(td)

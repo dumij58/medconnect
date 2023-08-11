@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField
+from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField
 from wtforms.validators import Length, EqualTo, Email, ValidationError
 from werkzeug.security import check_password_hash
 
@@ -175,8 +175,16 @@ class HlRegForm(FlaskForm):
 
     
 class SessionForm(FlaskForm):
-    hl_id = SelectField('Hospital', [data_required,], coerce=int)
+    hl_id = SelectField('Hospital', [data_required], coerce=int)
     date = DateField('Date', [data_required])
     start_t = TimeField('Start', [data_required])
     end_t = TimeField('End', [data_required])
     submit = SubmitField('Add')
+
+class ApmtSearchForm(FlaskForm):
+    doc = SearchField('Doctor', [data_required])
+    hl = SearchField('Hospital')
+    date = DateField('Date')
+    time = TimeField('Time')
+    submit = SubmitField('Search')
+

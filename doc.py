@@ -3,10 +3,10 @@ from flask import (
 )
 from markupsafe import escape
 from werkzeug.security import generate_password_hash
-from datetime import datetime
+from datetime import datetime, date
 
 from .helpers import login_required, f_time, f_date
-from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log, Hospital, DocSession
+from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log, Hospital, DocSession, Appointment
 from .forms import SessionForm
 
 bp = Blueprint('doc', __name__, url_prefix='/doc')
@@ -15,7 +15,9 @@ bp = Blueprint('doc', __name__, url_prefix='/doc')
 @bp.route('/dash', methods=('GET', 'POST'))
 @login_required
 def dash():
-    return render_template('doc/dash.html')
+    apmts = db.session.execute(db.select(Appointment, Patient, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Doctor.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
+    session = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.doc_id == g.user.id).where(DocSession.date >= date.today()).order_by(DocSession.date).order_by(DocSession.start_t)).all()
+    return render_template('doc/dash.html', session = session, apmts = apmts)
 
 @bp.route('/sessions', methods=('GET', 'POST'))
 @login_required
@@ -57,7 +59,7 @@ def sessions():
         else:
             showForm = True
 
-    doc_sessions = DocSession.query.filter(DocSession.doc_id == g.user.id).all()
+    doc_sessions = db.session.execute(db.select(DocSession, Hospital).join(Hospital).where(DocSession.date >= date.today()).order_by(DocSession.date, DocSession.start_t))
     return render_template('doc/sessions.html', form = form, show = showForm, sessions = doc_sessions)
 
 
@@ -82,3 +84,11 @@ def session_remove(s_id):
 
     flash(f'Session removed!','info')
     return redirect(url_for('doc.sessions'))
+
+
+@bp.route('/apmts', methods=('GET', 'POST'))
+@login_required
+def apmts():
+    apmts = db.session.execute(db.select(Appointment, Patient, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Doctor.id == g.user.id).order_by(Appointment.datetime)).all()
+    print(apmts)
+    return render_template('doc/appointments.html', apmts = apmts)
