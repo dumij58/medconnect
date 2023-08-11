@@ -3,7 +3,7 @@ from flask import (
 )
 from datetime import datetime, timedelta, date as d
 
-from .helpers import login_required, f_datetime, get_total_apmts
+from .helpers import login_required, f_datetime
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log, Hospital, DocSession, Appointment
 
 bp = Blueprint('pt', __name__, url_prefix='/pt')
@@ -49,24 +49,12 @@ def apmts():
 @login_required
 def book_apmt(s_id):
     session = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.id == s_id)).first()
-
     start_dt = datetime.combine(session.DocSession.date, session.DocSession.start_t)
-    total_apmts = get_total_apmts(s_id)
-
-    # Get the number of booked appointments
-    apmts = db.session.execute(db.select(Appointment).where(Appointment.s_id == s_id)).all()
-    if apmts:
-        curr_apmts = len(apmts)
-    else:
-        curr_apmts = 0
-
-    # Get the number of available appointments
-    avail_apmts = total_apmts - curr_apmts
+    total_apmts = session.DocSession.total_apmts
 
     # Calculate the approximate start time of the appointment (if each appointment is 20 minutes)
     apmt_duration = timedelta(minutes=20)
-    apmt_start_dt = start_dt + (apmt_duration * curr_apmts)
-    apmt_duration = int(apmt_duration.total_seconds() // 60)
+    apmt_start_dt = start_dt + (apmt_duration * session.DocSession.apmt_count)
 
     if request.method == 'POST':
 
@@ -89,6 +77,9 @@ def book_apmt(s_id):
         )
         db.session.add(append)
 
+        # Update apmt_count in session
+        db.session.execute(db.update(DocSession).where(DocSession.id == s_id).values(apmt_count = session.DocSession.apmt_count + 1))
+
         # Commit all changes to database
         db.session.commit()
 
@@ -97,8 +88,36 @@ def book_apmt(s_id):
         # Flash a message and redirect to login page
         flash('Booking Successful!', "success")
         return redirect(url_for('pt.apmts'))
+    
+    no_cancel = False
+    if session.DocSession.date < timedelta(days=7) + d.today():
+        no_cancel = True
+    return render_template('pt/booking.html', session = session, start_dt = apmt_start_dt, no_cancel = no_cancel)
 
-    return render_template('pt/booking.html', session = session, avail_apmts = avail_apmts, start_dt = apmt_start_dt)
+
+@bp.route('/apmts/cancel/<int:id>')
+@login_required
+def cancel_apmt(id):
+    apmt = db.session.execute(db.select(Appointment, DocSession, Doctor).join(DocSession, Appointment.s_id == DocSession.id).join(Doctor, Appointment.doc_id == Doctor.id).where(Appointment.id == id)).first()
+
+    # Update apmt_count in session
+    db.session.execute(db.update(DocSession).where(DocSession.id == apmt.Appointment.s_id).values(apmt_count = apmt.DocSession.apmt_count - 1))
+
+    # Append a remark to log
+    append = Log(
+        created = datetime.now(),
+        user = g.user.username,
+        remarks = f"{g.user.username} cancelled the appointment ({f_datetime(apmt.Appointment.datetime)}) with doctor ({apmt.Doctor.username})"
+    )
+    db.session.add(append)
+
+    # Delete appointment from database
+    db.session.execute(db.delete(Appointment).where(Appointment.id == id))
+
+    # Commit all changes to database
+    db.session.commit()
+
+    return redirect(url_for('pt.dash'))
 
 
 """ Get the Doctor list into the search form through js """
@@ -117,3 +136,13 @@ def get_hl():
     hospitals = Hospital.query.all()
     hospital_names = [hospital.name for hospital in hospitals]
     return jsonify(hospital_names)
+
+
+@bp.context_processor
+def utility_processor():
+    def no_cancel(dt):
+        if dt < timedelta(days=7) + datetime.now():
+            return True
+        else:
+            return False
+    return dict(no_cancel=no_cancel)

@@ -1,7 +1,7 @@
 import functools
 
 from flask import redirect, url_for, render_template, g
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from .models import db, Admin, Hospital, Doctor, DocSession
 from .forms import SessionForm
@@ -29,24 +29,14 @@ def admin_only(view):
     return wrapped_view
 
 
-def select_hospital(request, id):
-    hospital = None
-    form = SessionForm(request.POST, obj = hospital)
-    form.hl_id.choices = [ (hl.id, hl.name) for hl in Hospital.query.order_by('name') ]
-
-
-def get_total_apmts(s_id):
-    s = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.id == s_id)).first()
-
+def calc_total_apmts(date, start_t, end_t):
     # Combine doc session date with start and end times 
     # (datetime's time objects can't calculate a timedelta, but datetime and date objects can)
-    date = s.DocSession.date
-    start_dt = datetime.combine(date, s.DocSession.start_t)
-    end_dt = datetime.combine(date, s.DocSession.end_t)
+    start_dt = datetime.combine(date, start_t)
+    end_dt = datetime.combine(date, end_t)
     
     # Get total appointments for a session (if each appointment is 20 minutes)
     total = int((abs(end_dt - start_dt).total_seconds() // 60) // 20)
-
     return total
 
 

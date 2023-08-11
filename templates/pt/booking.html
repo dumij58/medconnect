@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-center">
-                    {{ avail_apmts }} Appointments Available
+                    {{ session.DocSession.total_apmts - session.DocSession.apmt_count }} Appointments Available
                 </div>
             </div>
         </div>
@@ -106,6 +106,7 @@
         <div class="fs-6 text-break text-center">
                 <p>Please make sure that above personal details are correct before continuing. They can't be chaged later.</p>
                 <p>If you want to change them, please go into your profile and change the datails there.</p>
+                {% if no_cancel %}<p class="text-danger">You have less than 7 days until the appointment, so you can't cancel the booking.</p>{% endif %}
                 <button class="btn btn-primary mt-2" type="button" data-bs-toggle="modal" data-bs-target="#confirmBookingModal">Confirm Booking</button>
         </div>
         <div class="modal fade" id="confirmBookingModal" tabindex="-1" aria-labelledby="confirmBookingModalLabel" aria-hidden="true">
@@ -116,8 +117,9 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>This appointment with {{ session.Doctor.full_name | dr }} is on {{ session.DocSession.date }} at {{ start_dt | noSeconds }}</p>
+                        <div class="fs-5 mb-2 text-center">Your appointment with {{ session.Doctor.full_name | dr }} will be on {{ session.DocSession.date }} at {{ start_dt | noSeconds }}</div>
                         <p>If you want to cancel the booking send a cancel request at least 7 days prior to the appointment date. If not cancellation will not be issued.</p>
+                        {% if no_cancel %}<p class="text-danger">You have less than 7 days until the appointment, so you can't cancel the booking.</p>{% endif %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

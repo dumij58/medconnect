@@ -77,7 +77,12 @@
                         </div>
                     </div>
                     <div class="col-md-2 d-flex justify-content-center align-items-center">
-                        <a href="#" class="btn btn-primary">View</a>
+                        <button type="button" class="btn {% if no_cancel(apmt.Appointment.datetime) %}btn-secondary{% else %}btn-danger{% endif %}" data-bs-toggle="modal" data-bs-target="#cancelApmtModal{{ apmt.Appointment.id }}" {% if no_cancel(apmt.Appointment.datetime) %}disabled{% endif %}>Cancel Appointment</button>
+                        {% from "_modalhelpers.html" import render_modal %}
+                        {{ render_modal(
+                            "cancelApmtModal" + str(apmt.Appointment.id), "Are you sure?", 
+                            "This action cancels your appointment with " ~ apmt.Doctor.full_name | dr ~ " (" ~ apmt.Appointment.datetime | dtNoS ~ ")",
+                            "Cancel Appointment", url_for('pt.cancel_apmt', id = apmt.Appointment.id), "danger" ) }}
                     </div>
                 </div>                
             </div>

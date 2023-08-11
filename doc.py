@@ -3,9 +3,9 @@ from flask import (
 )
 from markupsafe import escape
 from werkzeug.security import generate_password_hash
-from datetime import datetime, date
+from datetime import datetime, date as d
 
-from .helpers import login_required, f_time, f_date
+from .helpers import login_required, f_time, f_date, calc_total_apmts
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log, Hospital, DocSession, Appointment
 from .forms import SessionForm
 
@@ -16,7 +16,7 @@ bp = Blueprint('doc', __name__, url_prefix='/doc')
 @login_required
 def dash():
     apmts = db.session.execute(db.select(Appointment, Patient, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Doctor.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
-    session = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.doc_id == g.user.id).where(DocSession.date >= date.today()).order_by(DocSession.date).order_by(DocSession.start_t)).all()
+    session = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.doc_id == g.user.id).where(DocSession.date >= d.today()).order_by(DocSession.date).order_by(DocSession.start_t)).all()
     return render_template('doc/dash.html', session = session, apmts = apmts)
 
 @bp.route('/sessions', methods=('GET', 'POST'))
@@ -24,20 +24,30 @@ def dash():
 def sessions():
     form = SessionForm()
     form.hl_id.choices = [ (hl.id, hl.name) for hl in Hospital.query.order_by('name') ]
+
+    # Declare variables
     showForm = False
+    date = form.date.data
+    start_t = form.start_t.data
+    end_t = form.end_t.data
 
     # Ensure data is validated on submit
     if request.method == 'POST':
 
         if form.validate():
+
+            # Get total appointments for the duration of this session
+            total_apmts = calc_total_apmts(date, start_t, end_t)
             
             # Add records to database
             new_session = DocSession(
                 hl_id = form.hl_id.data,
                 doc_id = g.user.id,
-                date = form.date.data,
-                start_t = form.start_t.data,
-                end_t = form.end_t.data
+                date = date,
+                start_t = start_t,
+                end_t = end_t,
+                total_apmts = total_apmts
+                # Don't need to add "apmt_count" it has a default value of 0
             )
             db.session.add(new_session)
 
@@ -59,14 +69,14 @@ def sessions():
         else:
             showForm = True
 
-    doc_sessions = db.session.execute(db.select(DocSession, Hospital).join(Hospital).where(DocSession.date >= date.today()).order_by(DocSession.date, DocSession.start_t))
+    doc_sessions = db.session.execute(db.select(DocSession, Hospital).join(Hospital).where(DocSession.date >= d.today()).order_by(DocSession.date, DocSession.start_t))
     return render_template('doc/sessions.html', form = form, show = showForm, sessions = doc_sessions)
 
 
 @bp.route('/sessions/remove/<int:s_id>')
 @login_required
 def session_remove(s_id):
-    doc_session = DocSession.query.filter(DocSession.id == escape(s_id)).first()
+    doc_session = DocSession.query.filter(DocSession.id == escape(s_id)).first() ### Update Legacy commands
 
     # Append a remark to log
     append = Log(
@@ -89,6 +99,6 @@ def session_remove(s_id):
 @bp.route('/apmts', methods=('GET', 'POST'))
 @login_required
 def apmts():
-    apmts = db.session.execute(db.select(Appointment, Patient, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Doctor.id == g.user.id).order_by(Appointment.datetime)).all()
+    apmts = db.session.execute(db.select(Appointment, Patient, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Doctor.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
     print(apmts)
     return render_template('doc/appointments.html', apmts = apmts)

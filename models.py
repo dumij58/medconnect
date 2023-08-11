@@ -83,6 +83,8 @@ class DocSession(db.Model):
     end_t = Column(Time, nullable=False)
     doc_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)
     hl_id = Column(Integer, ForeignKey('hospital.id'), nullable=False)
+    total_apmts = Column(Integer, nullable=False)
+    apmt_count = Column(Integer, nullable=False, default=0)
 
     def __repr__(self):
         return f'<DocSession {self.id}>'
