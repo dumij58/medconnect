@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="h1">{% block title %}Add Details{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<div class="container ">
+    <form method="post" action="{{ url_for('pt.add_details') }}">
+        {{ form.csrf_token }}
+
+        <div class="h5 mt-5 mb-3">Medical History</div>
+        <div class="mx-4 mb-3">
+            {% for item in form.medical_history %}
+            <div class="row">
+                <div class="col-md">
+                    {{ render_field(item.medical_condition, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(item.diagnosis_date, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(item.treatment, class="form-control") }}
+                </div>
+                <div class="text-center mb-2">
+                    <div class="text-danger mb-1" id="medical-history-message"></div>
+                    <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-medical-history" data-add-url="{{ url_for('pt.add_medical_history') }}">Add</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-2 table-responsive-md">
+                <table class="table table-striped" id="medical-history-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Medical Condition</th>
+                            <th scope="col">Diagnosis Date</th>
+                            <th scope="col">Treatment</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mh_row in mh_rows %}
+                        <tr data-id="{{ mh_row.MedicalHistory.id }}" data-row-type="medical-history">
+                            <th scope="row">{{ mh_row.MedicalHistory.id }}</th>
+                            <td>{{ mh_row.MedicalHistory.medical_condition }}</td>
+                            <td>{{ mh_row.MedicalHistory.diagnosis_date }}</td>
+                            <td>{{ mh_row.MedicalHistory.treatment }}</td>
+                            <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="h5 mt-5 mb-3">Current Medications</div>
+        <div class="mx-4 mb-3">
+            {% for medication in form.current_medications %}
+            <div class="row">
+                <div class="col-md-3">
+                    {{ render_field(medication.medication_name, class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ render_field(medication.dosage, class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ render_field(medication.frequency, class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ render_field(medication.start_date, class="form-control") }}
+                </div>
+                <div class="text-center mb-2">
+                    <div class="text-danger mb-1" id="medication-message"></div>
+                    <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-medication" data-add-url="{{ url_for('pt.add_medication') }}">Add</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-2 table-responsive-md">
+                <table class="table table-striped" id="medication-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Medication Name</th>
+                            <th scope="col">Dosage</th>
+                            <th scope="col">Frequency</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for medication in medications %}
+                        <tr data-id="{{ medication.Medication.id }}" data-row-type="medication">
+                            <th scope="row">{{ medication.Medication.id }}</th>
+                            <td>{{ medication.Medication.medication_name }}</td>
+                            <td>{{ medication.Medication.dosage }}</td>
+                            <td>{{ medication.Medication.frequency }}</td>
+                            <td>{{ medication.Medication.start_date }}</td>
+                            <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="h5 mt-5 mb-3">Past Surgeries</div>
+        <div class="mx-4 mb-3">
+            {% for surgery in form.past_surgeries %}
+            <div class="row">
+                <div class="col-md-4">
+                    {{ render_field(surgery.surgery_name, class="form-control") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(surgery.date, class="form-control") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(surgery.notes, class="form-control") }}
+                </div>
+                <div class="text-center mb-2">
+                    <div class="text-danger mb-1" id="surgery-message"></div>
+                    <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-surgery" data-add-url="{{ url_for('pt.add_surgery') }}">Add</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-2 table-responsive-md">
+                <table class="table table-striped" id="surgery-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Surgery Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Notes</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for surgery in surgeries %}
+                        <tr data-id="{{ surgery.Surgery.id }}" data-row-type="surgery">
+                            <th scope="row">{{ surgery.Surgery.id }}</th>
+                            <td>{{ surgery.Surgery.surgery_name }}</td>
+                            <td>{{ surgery.Surgery.date }}</td>
+                            <td>{{ surgery.Surgery.notes }}</td>
+                            <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="h5 mt-5 mb-3">Vaccinations</div>
+        <div class="mx-4 mb-3">
+            {% for vaccination in form.vaccinations %}
+            <div class="row">
+                <div class="col-md-4">
+                    {{ render_field(vaccination.vaccine_name, class="form-control") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(vaccination.administration_date, class="form-control") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(vaccination.notes, class="form-control") }}
+                </div>
+                <div class="text-center mb-2">
+                    <div class="text-danger mb-1" id="vaccination-message"></div>
+                    <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-vaccination" data-add-url="{{ url_for('pt.add_vaccination') }}">Add</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-2 table-responsive-md">
+                <table class="table table-striped" id="vaccination-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Surgery Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Notes</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vaccination in vaccinations %}
+                        <tr data-id="{{ vaccination.Vaccination.id }}" data-row-type="vaccination">
+                            <th scope="row">{{ vaccination.Vaccination.id }}</th>
+                            <td>{{ vaccination.Vaccination.vaccine_name }}</td>
+                            <td>{{ vaccination.Vaccination.administration_date }}</td>
+                            <td>{{ vaccination.Vaccination.notes }}</td>
+                            <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="h5 mt-5 mb-3">Family Medical History</div>
+        <div class="mx-4 mb-3">
+            {% for family_member in form.family_medical_history %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ render_field(family_member.relationship, class="form-control") }}
+                </div>
+                <div class="col-md-6">
+                    {{ render_field(family_member.medical_condition, class="form-control") }}
+                </div>
+                <div class="text-center mb-2">
+                    <div class="text-danger mb-1" id="family-history-message"></div>
+                    <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-family-history" data-add-url="{{ url_for('pt.add_family_history') }}">Add</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-2 table-responsive-md">
+                <table class="table table-striped" id="family-history-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Relationship</th>
+                            <th scope="col">Medical Condition</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fh_row in fh_rows %}
+                        <tr data-id="{{ fh_row.FamilyHistory.id }}" data-row-type="family-history">
+                            <th scope="row">{{ fh_row.FamilyHistory.id }}</th>
+                            <td>{{ fh_row.FamilyHistory.relationship }}</td>
+                            <td>{{ fh_row.FamilyHistory.medical_condition }}</td>
+                            <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center">{{ form.submit(class="mt-4 mb-5 btn btn-primary") }}</div>
+    </form>
+</div>
+<script src="{{ url_for('static',filename='/js/pt_add_details.js') }}"></script>
+{% endblock %}

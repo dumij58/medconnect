@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField
-from wtforms.validators import Length, EqualTo, Email, ValidationError
+from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
+from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
 from werkzeug.security import check_password_hash
 
 from .models import db, Patient, Doctor, Admin, Hospital
@@ -40,12 +40,6 @@ def check_user(form, field):
         raise ValidationError(message=f"User {uname} already exist.")
 
 
-def check_gender(form, field):
-    gender = field.data
-    if gender != 'm' or gender != 'f':
-        raise ValidationError(message=f"Select a valid gender")
-
-
 class PtRegForm(FlaskForm):
     # Account creation details
     username = StringField('Username', [
@@ -61,9 +55,8 @@ class PtRegForm(FlaskForm):
     # Personal information
     full_name = StringField('Full Name', [data_required])
     gender = SelectField('Gender', [
-        data_required,
-        check_gender
-    ], choices=[('','Select Your Gender'),('m','Male'),('f','Female')])
+        data_required
+    ], choices=[('','Select Your Gender'),('m','Male'),('f','Female'),('o','Other')])
     dob = DateField('Date of Birth', [data_required])
     address = StringField('Address', [data_required])
     email = EmailField('Email Address', [
@@ -71,16 +64,54 @@ class PtRegForm(FlaskForm):
         Email(),
         length(min=6, max=35)
     ])
-    contact = TelField('Contact No.', [
+    contact = TelField('Contact', [
         data_required,
         Length(min=10, max=12, message='Invalid contact number')
     ])
-    emergency_contact = TelField('Emergency Contact No.', [
+    emergency_contact = TelField('Emergency Contact', [
         data_required,
         Length(min=10, max=12, message='Invalid contact number')
     ])
-    medical_history = TextAreaField('Medical History')
     submit = SubmitField('Sign Up')
+
+
+class MedicalHistoryForm(FlaskForm):
+    medical_condition = StringField('Medical Condition', validators=[Optional()])
+    diagnosis_date = DateField('Diagnosis Date', validators=[Optional()])
+    treatment = TextAreaField('Treatment', validators=[Optional()])
+
+
+class MedicationForm(FlaskForm):
+    medication_name = StringField('Medication Name', validators=[Optional()])
+    dosage = StringField('Dosage', validators=[Optional()])
+    frequency = StringField('Frequency', validators=[Optional()])
+    start_date = DateField('Start Date', validators=[Optional()])
+
+
+class PastSurgeryForm(FlaskForm):
+    surgery_name = StringField('Surgery Name', validators=[Optional()])
+    date = DateField('Date', validators=[Optional()])
+    notes = TextAreaField('Notes', validators=[Optional()])
+
+
+class VaccinationForm(FlaskForm):
+    vaccine_name = StringField('Vaccine Name', validators=[Optional()])
+    administration_date = DateField('Administration Date', validators=[Optional()])
+    notes = TextAreaField('Notes', validators=[Optional()])
+
+
+class FamilyHistoryForm(FlaskForm):
+    relationship = StringField('Relationship', validators=[Optional()])
+    medical_condition = StringField('Medical Condition', validators=[Optional()])
+
+
+class AddDetailsForm(FlaskForm):
+    medical_history = FieldList(FormField(MedicalHistoryForm), min_entries=1)
+    current_medications = FieldList(FormField(MedicationForm), min_entries=1)
+    past_surgeries = FieldList(FormField(PastSurgeryForm), min_entries=1)
+    vaccinations = FieldList(FormField(VaccinationForm), min_entries=1)
+    family_medical_history = FieldList(FormField(FamilyHistoryForm), min_entries=1)
+    submit = SubmitField('Go to Profile')
 
 
 class DocRegForm(FlaskForm):
@@ -98,9 +129,8 @@ class DocRegForm(FlaskForm):
     # Personal information
     full_name = StringField('Full Name', [data_required])
     gender = SelectField('Gender', [
-        data_required,
-        check_gender
-    ], choices=[('','Not Specified'),('m','Male'),('f','Female')])
+        data_required
+    ], choices=[('','Not Specified'),('m','Male'),('f','Female'),('o','Other')])
     dob = DateField('Date of Birth', [data_required])
     email = EmailField('Email Address', [
         data_required,
@@ -180,6 +210,7 @@ class SessionForm(FlaskForm):
     start_t = TimeField('Start', [data_required])
     end_t = TimeField('End', [data_required])
     submit = SubmitField('Add')
+
 
 class ApmtSearchForm(FlaskForm):
     doc = SearchField('Doctor', [data_required])

@@ -1,0 +1,7 @@
+<tr data-id="{{ surgery.id }}" data-row-type="surgery">
+    <th scope="row">{{ surgery.id }}</th>
+    <td>{{ surgery.surgery_name }}</td>
+    <td>{{ surgery.date }}</td>
+    <td>{{ surgery.notes }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

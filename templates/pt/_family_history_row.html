@@ -1,0 +1,6 @@
+<tr data-id="{{ fh_row.id }}" data-row-type="family-history">
+    <th scope="row">{{ fh_row.id }}</th>
+    <td>{{ fh_row.relationship }}</td>
+    <td>{{ fh_row.medical_condition }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

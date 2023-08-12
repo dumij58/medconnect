@@ -1,0 +1,7 @@
+<tr data-id="{{ mh_row.id }}" data-row-type="medical-history">
+    <th scope="row">{{ mh_row.id }}</th>
+    <td>{{ mh_row.medical_condition }}</td>
+    <td>{{ mh_row.diagnosis_date }}</td>
+    <td>{{ mh_row.treatment }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

@@ -48,6 +48,8 @@ def f_gender(gender):
         return "Female"
     if gender == "m":
         return "Male"
+    if gender == "o":
+        return "Other"
 
 def f_dr(doc):
     return f"Dr. {doc}"

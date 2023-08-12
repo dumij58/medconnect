@@ -6,7 +6,7 @@ from datetime import datetime
 
 from .helpers import login_required
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log
-from .forms import PtRegForm, DocRegForm, LoginForm
+from .forms import PtRegForm, DocRegForm, LoginForm, AddDetailsForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -33,7 +33,6 @@ def register():
             contact = form.contact.data,
             address = form.address.data,
             emergency_contact = form.emergency_contact.data,
-            medical_history = form.medical_history.data,
             created = datetime.now()
         )
         ## Add records to database and commit all changes
@@ -42,7 +41,7 @@ def register():
         # Append a remark to log
         append = Log(
             created = datetime.now(),
-            user = Patient.query.filter(Patient.username == form.username.data).first().username,
+            user = form.username.data,
             remarks = f"Patient ({form.username.data}) added to DB"
         )
         db.session.add(append)
@@ -50,8 +49,8 @@ def register():
         # Commit all changes to database
         db.session.commit()
         
-        # Flash a message and redirect to login page
-        flash('Registration Successful!', "success")
+        # Redirect to add patient details page
+        # flash('Registration Successful!', "success")
         return redirect(url_for('auth.login'))
     
     # Render the registration form

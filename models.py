@@ -1,6 +1,42 @@
-from sqlalchemy import Column, Text, Integer, Date, Time, Numeric, DateTime, Boolean, ForeignKey
-
+from sqlalchemy import Column, Text, Integer, Date, Time, Numeric, DateTime, ForeignKey, Boolean
 from . import db
+
+
+class MedicalHistory(db.Model):
+    id = Column(Integer, primary_key=True)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    medical_condition = Column(Text)
+    diagnosis_date = Column(Date)
+    treatment = Column(Text)
+
+class Medication(db.Model):
+    id = Column(Integer, primary_key=True)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    medication_name = Column(Text)
+    dosage = Column(Text)
+    frequency = Column(Text)
+    start_date = Column(Date)
+
+class Surgery(db.Model):
+    id = Column(Integer, primary_key=True)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    surgery_name = Column(Text)
+    date = Column(Date)
+    notes = Column(Text)
+
+class Vaccination(db.Model):
+    id = Column(Integer, primary_key=True)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    vaccine_name = Column(Text)
+    administration_date = Column(Date)
+    notes = Column(Text)
+
+class FamilyHistory(db.Model):
+    id = Column(Integer, primary_key=True)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    relationship = Column(Text)
+    medical_condition = Column(Text)
+
 
 class Patient(db.Model):
     """ Data model for patient accounts """
@@ -15,8 +51,15 @@ class Patient(db.Model):
     email = Column(Text, unique=True, nullable=False)
     address = Column(Text, nullable=False)
     emergency_contact = Column(Numeric, nullable=False)
-    medical_history = Column(Text, nullable=True)
     created = Column(DateTime(timezone=False), nullable=False)
+    details_added = Column(Boolean, default=False, nullable=False)
+
+    # Relationships
+    medical_history = db.relationship('MedicalHistory', backref='patient', lazy=True)
+    current_medications = db.relationship('Medication', backref='patient', lazy=True)
+    past_surgeries = db.relationship('Surgery', backref='patient', lazy=True)
+    vaccinations = db.relationship('Vaccination', backref='patient', lazy=True)
+    family_medical_history = db.relationship('FamilyHistory', backref='patient', lazy=True)
 
     def __repr__(self):
         return f'<Patient {self.username}>'
@@ -88,6 +131,21 @@ class DocSession(db.Model):
 
     def __repr__(self):
         return f'<DocSession {self.id}>'
+    
+
+class MedicalRecords(db.Model):
+    """ Data model to store appointments """
+
+    id = Column(Integer, primary_key=True, index=True)
+    created = Column(DateTime, unique=True, nullable=False)
+    doc_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)
+    pt_id = Column(Integer, ForeignKey('patient.id'), nullable=False)
+    hl_id = Column(Integer, ForeignKey('hospital.id'), nullable=False)
+    file = Column(Text, unique=True, nullable=False)
+    passkey = Column(Text, unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Appointment {self.id}>'
 
 
 class Hospital(db.Model):
