@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
         medicalCondition.value = "";
         diagnosisDate.value = "";
         treatment.value = "";
+        
     });
 
     addMedicationBtn.addEventListener("click", function() {
@@ -98,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
         dosage.value = "";
         frequency.value = "";
         startDate.value = "";
-
+        
     });
 
     addSurgeryBtn.addEventListener("click", function() {
@@ -140,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function() {
         surgeryName.value = "";
         date.value = "";
         notes.value = "";
+        
     });
 
     addVaccinationBtn.addEventListener("click", function() {
@@ -180,6 +182,7 @@ document.addEventListener("DOMContentLoaded", function() {
         vaccineName.value = "";
         administrationDate.value = "";
         notes.value = "";
+        
     });
 
     addFamilyHistoryBtn.addEventListener("click", function() {
@@ -217,37 +220,45 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         relationship.value = "";
         medicalCondition.value = "";
+        
     });
 
-    // Add click event listener to all Remove buttons
-    const removeButtons = document.querySelectorAll(".remove-button");
-    removeButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const tableRow = button.closest("tr"); // Get the <tr> tag closest to the button
-            const entryId = tableRow.getAttribute("data-id");
-            const rowType = tableRow.getAttribute("data-row-type");
-            const removeUrl = button.getAttribute("data-remove-url");
-
-            // Create data object with id and type
-            const data = {
-                id: entryId,
-                type: rowType
-            };
-
-            // Send data to Flask route using fetch API
-            fetch(removeUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Remove the table row
-                tableRow.remove();
-            });
+    const everyTableBody = document.querySelectorAll(".details-table tbody");
+    // Attach event listener to the table body to handle "X" button clicks
+    everyTableBody.forEach(tableBody => {
+        tableBody.addEventListener("click", function(event) {
+            const clickedButton = event.target;
+            if (clickedButton.classList.contains("remove-button")) {
+                handleRemoveButton(clickedButton);
+            }
         });
     });
+    
+    function handleRemoveButton(button) {
+        console.log("X button clicked");
+        tableRow = button.closest("tr"); // Get the <tr> tag closest to the button
+        entryId = tableRow.getAttribute("data-id");
+        rowType = tableRow.getAttribute("data-row-type");
+        removeUrl = button.getAttribute("data-remove-url");
 
+        // Create data object with id and type
+        const data = {
+            id: entryId,
+            type: rowType
+        };
+
+        // Send data to Flask route using fetch API
+        fetch(removeUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove the table row
+            tableRow.remove();
+        });
+    }
 });

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
 from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from .models import db, Patient, Doctor, Admin, Hospital
 
@@ -13,6 +13,8 @@ def data_required(form, field):
             field_name = "Full Name"
         elif field.name == "emergency_contact":
             field_name = "Emergency Contact"
+        elif field.name == "old_pass":
+            field_name = "Old Password"
         else:
             field_name = field.name
         raise ValidationError(message=f'{field_name.capitalize()} is required.')
@@ -219,3 +221,12 @@ class ApmtSearchForm(FlaskForm):
     time = TimeField('Time')
     submit = SubmitField('Search')
 
+
+class ChangePassForm(FlaskForm):
+    old_pass = PasswordField('Old Password', [data_required])
+    password = PasswordField('New Password', [data_required])
+    confirm = PasswordField('Repeat Password', [
+        data_required,
+        EqualTo('password', message="Passwords doesn't match")
+    ])
+    submit = SubmitField('Change Password')

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="h1">{% block title %}Change Password{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+    {% from "_formhelpers.html" import render_field %}
+    <div class="container">
+        <form method="post" action="{{ url_for('auth.change_pass', user_type = session.get('user_type'), id = g.user.id) }}">
+            {{ form.csrf_token }}
+            <dl>
+                {{ render_field(form.old_pass, class="form-control") }}
+                {{ render_field(form.password, class="form-control") }}
+                {{ render_field(form.confirm, class="form-control") }}
+            </dl>
+            {{ form.submit(class="btn btn-primary my-3") }}
+        </form>
+    </div>
+{% endblock %}

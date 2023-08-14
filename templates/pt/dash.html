@@ -10,6 +10,32 @@
         <span><a href="{{ url_for('pt.add_details') }}" class="btn btn-sm btn-outline-warning m-1">Add More Details</a></span>
     </div>
     {% endif %}
+    
+    <div class="mb-3">
+        <div class="row gap-3">
+            <div class="p-3 col-md bg-body-secondary rounded">
+                <div class="row align-items-center">
+                    <div class="col-md mb-2">
+                        <div class="d-flex flex-column">
+                            <div class="fs-4">{{ g.user.full_name }}</div>
+                            <div class="fs-6 text-secondary">@{{ g.user.username }}</div> 
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column justify-content-center">
+                            <a href="{{ url_for('main.profile', user_type = session.get('user_type'), id = g.user.id) }}" class="btn btn-primary btn-sm mx-2">Go to Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 col-md-4 text-center bg-body-tertiary rounded">
+                <div class="d-flex flex-md-column flex-row justify-content-center align-items-center">
+                    <div class="fs-6 my-1">Want to channel a doctor?</div>
+                    <a href="{{ url_for('pt.apmts') }}" class="btn btn-primary btn-sm mx-2">Make an Appointment</a> 
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="p-3 mb-3 bg-body-tertiary rounded">
         <div class="fs-4 mb-4 text-center">Upcoming Appointments</div>

@@ -1,12 +1,12 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for
 )
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 from .helpers import login_required
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log
-from .forms import PtRegForm, DocRegForm, LoginForm, AddDetailsForm
+from .forms import PtRegForm, DocRegForm, LoginForm, AddDetailsForm, ChangePassForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -149,6 +149,38 @@ def login():
         return redirect(url_for('index'))
     
     return render_template('auth/login.html', form = form)
+
+
+@bp.route('/change_pass/<user_type>_id=<int:id>', methods=('GET', 'POST'))
+@login_required
+def change_pass(user_type, id):
+    form = ChangePassForm()
+
+    # Ensure only the user logged in is asking for a change of password
+    if user_type != flask_session.get('user_type') or id != g.user.id:
+        return render_template('error.html', e_code = 401, e_text = "Unorthorized")
+    
+    if request.method == 'POST' and form.validate():
+        if user_type == 'patient':
+            user = db.session.execute(db.select(Patient).where(Patient.id == id)).first().Patient
+            if check_password_hash(user.hash, form.old_pass.data):
+                new_hash = generate_password_hash(form.password.data)
+                db.session.execute(db.update(Patient).where(Patient.id == id).values(hash = new_hash))
+        elif user_type == 'doctor':
+            user = db.session.execute(db.select(Doctor).where(Doctor.id == id)).first().Doctor
+            if check_password_hash(user.hash, form.old_pass.data):
+                new_hash = generate_password_hash(form.password.data)
+                db.session.execute(db.update(Doctor).where(Doctor.id == id).values(hash = new_hash))
+        elif user_type == 'admin':
+            user = db.session.execute(db.select(Admin).where(Admin.id == id)).first().Admin
+            if check_password_hash(user.hash, form.old_pass.data):
+                new_hash = generate_password_hash(form.password.data)
+                db.session.execute(db.update(Admin).where(Admin.id == id).values(hash = new_hash))
+        db.session.commit()
+        flash('Password changed successfully!','success')
+        return redirect(url_for('main.profile', type = flask_session.get('user_type'), id = g.user.id))
+    else:
+        return render_template('auth/change_pass.html',form = form)
 
 
 @bp.before_app_request

@@ -1,12 +1,7 @@
 import os
 # import secrets
-
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 
-db = SQLAlchemy()
-migrate = Migrate()
 
 def create_app():
     # Create and configure the app
@@ -23,12 +18,12 @@ def create_app():
         os.makedirs(app.instance_path)
     except OSError:
         pass
-        
+    
+    from .models import db, migrate
     db.init_app(app)
     migrate.init_app(app, db)
 
     with app.app_context():
-        from . import models
         db.create_all()
 
     # Import and register blueprints

@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Text, Integer, Date, Time, Numeric, DateTime, ForeignKey, Boolean
-from . import db
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
+db = SQLAlchemy()
+migrate = Migrate()
 
 class MedicalHistory(db.Model):
     id = Column(Integer, primary_key=True)

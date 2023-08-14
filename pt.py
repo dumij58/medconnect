@@ -17,6 +17,7 @@ def dash():
     apmts = db.session.execute(db.select(Appointment, Doctor, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Patient.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
     return render_template('pt/dash.html', check_details = user.details_added, apmts = apmts)
 
+
 @bp.route('/apmts')
 @login_required
 def apmts():
@@ -72,6 +73,58 @@ def add_details():
     # Render the registration form
     return render_template('pt/add_details.html',form = form, medications = medications, surgeries = surgeries, vaccinations = vaccinations, fh_rows = fh_rows, mh_rows = mh_rows)
 
+
+@bp.route('/change_details', methods=['POST'])
+@login_required
+def change_details():
+    form_data = request.get_json()
+    full_name = form_data['full_name']
+    gender = form_data['gender']
+    dob = datetime.strptime(form_data['dob'], '%Y-%m-%d').date()
+    email = form_data['email']
+    contact = form_data['contact']
+    emergency_contact = form_data['emergency_contact']
+    address = form_data['address']
+
+    pt = db.session.execute(db.select(Patient).where(Patient.id == g.user.id)).first().Patient
+    updateStatement = db.update(Patient).where(Patient.id == g.user.id)
+    updatedValues = {}
+
+    if full_name and full_name != pt.full_name:
+        db.session.execute(updateStatement.values(full_name = full_name))
+        updatedValues["full_name"] = full_name
+    if gender and gender != pt.gender:
+        db.session.execute(updateStatement.values(gender = gender))
+        updatedValues["gender"] = gender
+    if dob and dob != pt.dob:
+        db.session.execute(updateStatement.values(dob = dob))
+        updatedValues["dob"] = dob.strftime('%Y-%m-%d')
+    if email and email != pt.email:
+        db.session.execute(updateStatement.values(email = email))
+        updatedValues["email"] = email
+    if contact and contact != pt.contact:
+        db.session.execute(updateStatement.values(contact = contact))
+        updatedValues["contact"] = contact
+    if emergency_contact and emergency_contact != pt.emergency_contact:
+        db.session.execute(updateStatement.values(emergency_contact = emergency_contact))
+        updatedValues["emergency_contact"] = emergency_contact
+    if address and address != pt.address:
+        db.session.execute(updateStatement.values(address = address))
+        updatedValues["address"] = address
+    db.session.commit()
+    
+    return jsonify(updatedValues)
+
+
+@bp.route('/change_uname', methods=['POST'])
+@login_required
+def change_uname():
+    uname = request.json.get('username')
+    db.session.execute(db.update(Patient).where(Patient.id == g.user.id).values(username = uname))
+    db.session.commit()
+    response = {}
+    response['username'] = uname
+    return jsonify(response)
 
 @bp.route('/add_details/remove', methods=['POST'])
 @login_required
