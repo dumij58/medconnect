@@ -235,7 +235,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     function handleRemoveButton(button) {
-        console.log("X button clicked");
         tableRow = button.closest("tr"); // Get the <tr> tag closest to the button
         entryId = tableRow.getAttribute("data-id");
         rowType = tableRow.getAttribute("data-row-type");

@@ -68,6 +68,12 @@ class Patient(db.Model):
         return f'<Patient {self.username}>'
     
 
+class Specialization(db.Model):
+    id = Column(Integer, primary_key=True)
+    doc_id = Column(Integer, ForeignKey('doctor.id'), nullable=False)
+    specialization = Column(Text)
+
+
 class Doctor(db.Model):
     """ Data model for doctor accounts """
 
@@ -78,11 +84,13 @@ class Doctor(db.Model):
     dob = Column(Date, nullable=False)
     contact = Column(Numeric, nullable=False)
     email = Column(Text, unique=True, nullable=False)
-    specialities = Column(Text, nullable=True)
     reg_no = Column(Integer, unique=True, nullable=False)
     hash = Column(Text, nullable=False)
     created = Column(DateTime(timezone=False), nullable=False)
     validated = Column(DateTime(timezone=False), nullable=False)
+
+    # Relationships
+    specialization = db.relationship('Specialization', backref='doctor', lazy=True)
 
     def __repr__(self):
         return f'<Doctor {self.username}>'

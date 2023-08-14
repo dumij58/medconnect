@@ -11,31 +11,57 @@
             <a class="link-info link-opacity-75 link-opacity-100-hover link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.register') }}">Normal Registration</a>
         </div>
     </div>
+    <p class="text-center my-2">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
     {% from "_formhelpers.html" import render_field %}
-    <div class="container ">
+    <div class="container mb-5">
         <form method="post" action="{{ url_for('auth.doc_register') }}">
             {{ form.csrf_token }}
             <div class="h5 mt-3 mb-3">Account Details</div>
             <div class="mx-4">
-                {{ render_field(form.username, class="form-control") }}
-                {{ render_field(form.password, class="form-control") }}
-                {{ render_field(form.confirm, class="form-control") }}
+                <div class="row">
+                    <div class="col-md">
+                        {{ render_field(form.username, class="form-control") }}
+                    </div>
+                    <div class="col-md">
+                        {{ render_field(form.password, class="form-control") }}
+                    </div>
+                    <div class="col-md">
+                        {{ render_field(form.confirm, class="form-control") }}
+                    </div>
+                </div>
             </div>
             <div class="h5 mt-5 mb-3">Doctor Information</div>
             <div class="mx-4">
                 {{ render_field(form.full_name, class="form-control") }}
-                {{ render_field(form.gender, class="form-control") }}
-                {{ render_field(form.dob, class="form-control") }}
-                {{ render_field(form.email, class="form-control") }}
-                {{ render_field(form.contact, class="form-control") }}
-                {{ render_field(form.reg_no, class="form-control") }}
-                {{ render_field(form.specialities, class="form-control") }}
+                <div class="row">
+                    <div class="col-md">
+                        {{ render_field(form.gender, class="form-control") }}
+                    </div>
+                    <div class="col-md">
+                        {{ render_field(form.dob, class="form-control") }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        {{ render_field(form.email, class="form-control") }}
+                    </div>
+                    <div class="col-md">
+                        {{ render_field(form.contact, class="form-control") }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        {{ render_field(form.reg_no, class="form-control") }}
+                    </div>
+                    <div class="col-md">
+                        {{ render_field(form.specialization, class="form-control") }}
+                    </div>
+                </div>
             </div>
             <!--{% for error in form.errors %}
                 <div>{{ error }}</div>
             {% endfor %}-->
             {{ form.submit(class="btn btn-primary mx-4 mt-4") }}
         </form>
-        <p class="text-center my-5">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
     </div>
 {% endblock %}

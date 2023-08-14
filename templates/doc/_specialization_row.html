@@ -1,0 +1,5 @@
+<tr data-id="{{ specialization.id }}">
+    <th scope="row">{{ specialization.id }}</th>
+    <td>{{ specialization.specialization }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('doc.add_specialization_remove') }}"></button></td>
+</tr>

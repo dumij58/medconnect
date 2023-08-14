@@ -34,6 +34,7 @@
                         <div class="col-md ">
                             {{ render_field(form.username, class="form-control", placeholder=g.user.username, disabled=True) }}
                             <div class="text-center">
+                                <div class="text-danger mb-1" id="uname-message"></div>
                                 <span><button type="button" class="btn btn-primary m-1" id="edit-uname-button">Change Username</button></span>
                                 <span><button type="submit" class="btn btn-primary m-1" id="submit-uname-button" data-url="{{ url_for('pt.change_uname') }}" hidden disabled>Save Changes</button></span>
                             </div>

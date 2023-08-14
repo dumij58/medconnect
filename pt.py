@@ -4,7 +4,7 @@ from flask import (
 from datetime import datetime, timedelta, date as d
 
 from .helpers import login_required, f_datetime
-from .models import db, Patient, Doctor, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory
+from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory
 from .forms import AddDetailsForm
 
 bp = Blueprint('pt', __name__, url_prefix='/pt')
@@ -119,11 +119,19 @@ def change_details():
 @bp.route('/change_uname', methods=['POST'])
 @login_required
 def change_uname():
-    uname = request.json.get('username')
+    uname = str(request.json.get('username')).lower()
+    response = {}
+
+    if db.session.execute(db.select(Patient).where(Patient.username == uname)).first() or \
+        db.session.execute(db.select(Doctor).where(Doctor.username == uname)).first() or \
+        db.session.execute(db.select(Admin).where(Admin.username == uname)).first():
+        response['message'] = 'username taken' 
+        return jsonify(response)
+
     db.session.execute(db.update(Patient).where(Patient.id == g.user.id).values(username = uname))
     db.session.commit()
-    response = {}
     response['username'] = uname
+    response['message'] = 'success'
     return jsonify(response)
 
 @bp.route('/add_details/remove', methods=['POST'])

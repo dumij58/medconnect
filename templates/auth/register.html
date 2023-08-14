@@ -11,9 +11,9 @@
         <a class="link-info link-opacity-75 link-opacity-100-hover link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.doc_register') }}">Doctor Registration</a>
     </div>
 </div>
-<p class="text-center my-1">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
+<p class="text-center my-2">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
 {% from "_formhelpers.html" import render_field %}
-<div class="container ">
+<div class="container mb-5">
     <form method="post" action="{{ url_for('auth.register') }}">
         {{ form.csrf_token }}
         <div class="h5 mt-3 mb-3">Account Details</div>

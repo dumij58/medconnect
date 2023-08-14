@@ -75,6 +75,9 @@ function editDetails() {
         input.addEventListener("input", function() {
             saveButton.disabled = false;
         });
+        selectGender.addEventListener("change", function() {
+            saveButton.disabled = false;
+        });
     });
 }
 
@@ -128,12 +131,6 @@ function saveDetails(url) {
         }
         if (data.contact != null) {
             document.getElementById("contact").setAttribute("placeholder", data.contact);
-        }
-        if (data.emergency_contact != null) {
-            document.getElementById("emergency_contact").setAttribute("placeholder", data.emergency_contact);
-        }
-        if (data.address != null) {
-            document.getElementById("address").setAttribute("placeholder", data.address);
         }
         cancelEditing();
     });

@@ -144,8 +144,11 @@ class DocRegForm(FlaskForm):
         Length(min=10, max=12, message='Invalid contact number')
     ])
     reg_no = IntegerField('Registration No.', [data_required])
-    specialities = StringField('Specialities')
     submit = SubmitField('Sign Up')
+
+
+class AddSpecializationForm(FlaskForm):
+    specialization = StringField('Specialization', validators=[Optional()])
                 
 
 def check_uname(form, field):
