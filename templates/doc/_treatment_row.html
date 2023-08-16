@@ -1,0 +1,5 @@
+<tr data-id="{{ treatment.id }}" data-row-type="treatment">
+    <td>{{ treatment.title }}</td>
+    <td>{{ treatment.notes }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

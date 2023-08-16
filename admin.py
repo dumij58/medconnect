@@ -33,7 +33,7 @@ def doc_validate(doc_id):
         email = docdata.email,
         contact = docdata.contact,
         reg_no = docdata.reg_no,
-        specialities = docdata.specialities,
+        specializations = docdata.specializations,
         created = docdata.created,
         validated = datetime.now()
     )

@@ -2,9 +2,10 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, jsonify
 )
 from datetime import datetime, timedelta, date as d
+from sqlalchemy.orm import joinedload, lazyload
 
 from .helpers import login_required, f_datetime
-from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory
+from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther
 from .forms import AddDetailsForm
 
 bp = Blueprint('pt', __name__, url_prefix='/pt')
@@ -14,7 +15,7 @@ bp = Blueprint('pt', __name__, url_prefix='/pt')
 @login_required
 def dash():
     user = db.session.execute(db.select(Patient).where(Patient.id == g.user.id)).first().Patient
-    apmts = db.session.execute(db.select(Appointment, Doctor, Hospital).join(Doctor, Appointment.doc_id == Doctor.id).join(Patient, Appointment.pt_id == Patient.id).join(Hospital, Appointment.hl_id == Hospital.id).where(Patient.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
+    apmts = db.session.execute(db.select(Appointment).where(Patient.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
     return render_template('pt/dash.html', check_details = user.details_added, apmts = apmts)
 
 
@@ -26,22 +27,21 @@ def apmts():
     hl_id  = db.session.execute(db.select(Hospital.id).where(Hospital.name == request.args.get('hl'))).scalar()
     date  = request.args.get('date')
 
-    # Join statement for joining doc_session, doctor and hospital tables
-    joined = db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital)
+    joinedStatement = db.select(DocSession, Doctor, Hospital).join(Doctor, DocSession.doc_id == Doctor.id).join(Hospital, DocSession.hl_id == Hospital.id)
 
     # Ensure every possibility of user input gets a result
     if doc_id and hl_id and date:
-        sessions = db.session.execute(joined.where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(DocSession.date).order_by(DocSession.start_t))
     elif doc_id and hl_id:
-        sessions = db.session.execute(joined.where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(DocSession.date > d.today()).order_by(DocSession.date).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(DocSession.date > d.today()).order_by(DocSession.date).order_by(DocSession.start_t))
     elif doc_id and date:
-        sessions = db.session.execute(joined.where(Doctor.id == doc_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(Hospital.name).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(DocSession.hospital.name).order_by(DocSession.start_t))
     elif date and hl_id:
-        sessions = db.session.execute(joined.where(Hospital.id == hl_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(Doctor.full_name).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Hospital.id == hl_id).where(DocSession.date == date).where(DocSession.date > d.today()).order_by(DocSession.doctor.full_name).order_by(DocSession.start_t))
     elif doc_id:
-        sessions = db.session.execute(joined.where(Doctor.id == doc_id).where(DocSession.date > d.today()).order_by(Hospital.name).order_by(DocSession.date).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(DocSession.date > d.today()).order_by(Hospital.name).order_by(DocSession.date).order_by(DocSession.start_t))
     elif hl_id:
-        sessions = db.session.execute(joined.where(Hospital.id == hl_id).where(DocSession.date > d.today()).order_by(Doctor.full_name).order_by(DocSession.date).order_by(DocSession.start_t))
+        sessions = db.session.execute(joinedStatement.where(Hospital.id == hl_id).where(DocSession.date > d.today()).order_by(Doctor.full_name).order_by(DocSession.date).order_by(DocSession.start_t))
     else:
         sessions = None
 
@@ -151,6 +151,16 @@ def add_details_remove():
         db.session.execute(db.delete(Vaccination).where(Vaccination.id == id))
     elif type == 'family-history':
         db.session.execute(db.delete(FamilyHistory).where(FamilyHistory.id == id))
+    elif type == 'vital-sign':
+        db.session.execute(db.delete(VitalSign).where(VitalSign.id == id))
+    elif type == 'examination-note':
+        db.session.execute(db.delete(ExaminationNote).where(ExaminationNote.id == id))
+    elif type == 'order-test':
+        db.session.execute(db.delete(OrderTest).where(OrderTest.id == id))
+    elif type == 'treatment-medication':
+        db.session.execute(db.delete(TreatmentMedications).where(TreatmentMedications.id == id))
+    elif type == 'treatment-other':
+        db.session.execute(db.delete(TreatmentOther).where(TreatmentOther.id == id))
 
     # Commit all changes
     db.session.commit()
@@ -280,12 +290,14 @@ def add_family_history():
     # Get data from the POST request
     relationship = request.json.get('relationship')
     medical_condition = request.json.get('medical_condition')
+    notes = request.json.get('notes')
     
     # Create a new Medication object and add it to the database
     new_family_history = FamilyHistory(
         pt_id = g.user.id,
         relationship = relationship,
-        medical_condition = medical_condition
+        medical_condition = medical_condition,
+        notes = notes
     )
     db.session.add(new_family_history)
     db.session.commit()
@@ -302,23 +314,24 @@ def add_family_history():
 @bp.route('/apmts/book/<int:s_id>', methods=('GET', 'POST'))
 @login_required
 def book_apmt(s_id):
-    session = db.session.execute(db.select(DocSession, Doctor, Hospital).join(Doctor).join(Hospital).where(DocSession.id == s_id)).first()
-    start_dt = datetime.combine(session.DocSession.date, session.DocSession.start_t)
-    total_apmts = session.DocSession.total_apmts
+    doc_session = db.session.execute(db.select(DocSession).where(DocSession.id == s_id)).first()
+    start_dt = datetime.combine(doc_session.DocSession.date, doc_session.DocSession.start_t)
+    total_apmts = doc_session.DocSession.total_apmts
 
     # Calculate the approximate start time of the appointment (if each appointment is 20 minutes)
     apmt_duration = timedelta(minutes=20)
-    apmt_start_dt = start_dt + (apmt_duration * session.DocSession.apmt_count)
+    apmt_start_dt = start_dt + (apmt_duration * doc_session.DocSession.apmt_count)
 
     if request.method == 'POST':
 
         # Update database
         new_apmt = Appointment(
             datetime = apmt_start_dt,
-            doc_id = session.Doctor.id,
+            doc_id = doc_session.DocSession.doctor.id,
             pt_id = g.user.id,
-            hl_id = session.Hospital.id,
-            s_id = session.DocSession.id
+            hl_id = doc_session.DocSession.hospital.id,
+            s_id = doc_session.DocSession.id,
+            status = "scheduled"
         )
         ## Add records to database and commit all changes
         db.session.add(new_apmt)
@@ -327,12 +340,12 @@ def book_apmt(s_id):
         append = Log(
             created = datetime.now(),
             user = g.user.username,
-            remarks = f"{g.user.username} booked an appointment (Session ID-{session.DocSession.id}) on {f_datetime(apmt_start_dt)}"
+            remarks = f"{g.user.username} booked an appointment (Session ID-{doc_session.DocSession.id}) on {f_datetime(apmt_start_dt)}"
         )
         db.session.add(append)
 
-        # Update apmt_count in session
-        db.session.execute(db.update(DocSession).where(DocSession.id == s_id).values(apmt_count = session.DocSession.apmt_count + 1))
+        # Update apmt_count in doc_session
+        db.session.execute(db.update(DocSession).where(DocSession.id == s_id).values(apmt_count = doc_session.DocSession.apmt_count + 1))
 
         # Commit all changes to database
         db.session.commit()
@@ -344,9 +357,9 @@ def book_apmt(s_id):
         return redirect(url_for('pt.apmts'))
     
     no_cancel = False
-    if session.DocSession.date < timedelta(days=7) + d.today():
+    if doc_session.DocSession.date < timedelta(days=7) + d.today():
         no_cancel = True
-    return render_template('pt/booking.html', session = session, start_dt = apmt_start_dt, no_cancel = no_cancel)
+    return render_template('pt/booking.html', doc_session = doc_session, start_dt = apmt_start_dt, no_cancel = no_cancel)
 
 
 @bp.route('/apmts/cancel/<int:id>')

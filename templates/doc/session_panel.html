@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container-md p-3 mb-4 bg-body-tertiary rounded">
-    <div class="fs-4 mb-3 text-center">Upcoming Appointments</div>
+    <div class="fs-4 mb-3 text-center">Appointments</div>
     <div class="container-fluid">
         {% if apmts %}
         {% for item in apmts %}
@@ -42,15 +42,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-3 d-flex justify-content-center align-items-center">
-                        <a href="{{ url_for('doc.apmt_panel', id = item.Appointment.id) }}" class="btn btn-primary">View</a>
+                    <div class="col-sm-3 d-flex flex-column gap-2 justify-content-center align-items-center">
+                        {% if item.Appointment.status == "scheduled" %}
+                        <a href="{{ url_for('doc.apmt_start', id = item.Appointment.id) }}" class="btn btn-primary">Start Appointment</a>
+                        {% elif item.Appointment.status == "ongoing" %}
+                        <a href="{{ url_for('doc.apmt_panel', id = item.Appointment.id) }}" class="btn btn-primary">View Appointment</a>
+                        {% endif %}
+                        {% if item.Appointment.status != "ongoing" %}
+                        <a href="{{ url_for('doc.apmt_no_show', id = item.Appointment.id) }}" class="btn btn-outline-danger">Mark as No-Show</a>
+                        {% endif %}
                     </div>
                 </div>                
             </div>
         </div>
         {% endfor %}
         {% else %}
-        <div class="fs-6 text-center text-break text-secondary">No upcoming appointments</div>
+        <div class="fs-6 text-center text-break text-secondary">No scheduled/ongoing appointments in this session</div>
         {% endif %}
     </div>
 </div>

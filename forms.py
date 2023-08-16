@@ -15,6 +15,8 @@ def data_required(form, field):
             field_name = "Emergency Contact"
         elif field.name == "old_pass":
             field_name = "Old Password"
+        elif field.name == "reg_no":
+            field_name = "Registration No."
         else:
             field_name = field.name
         raise ValidationError(message=f'{field_name.capitalize()} is required.')
@@ -105,6 +107,7 @@ class VaccinationForm(FlaskForm):
 class FamilyHistoryForm(FlaskForm):
     relationship = StringField('Relationship', validators=[Optional()])
     medical_condition = StringField('Medical Condition', validators=[Optional()])
+    notes = TextAreaField('Notes', validators=[Optional()])
 
 
 class AddDetailsForm(FlaskForm):
@@ -144,11 +147,8 @@ class DocRegForm(FlaskForm):
         Length(min=10, max=12, message='Invalid contact number')
     ])
     reg_no = IntegerField('Registration No.', [data_required])
+    specializations = StringField('Specializations', [data_required])
     submit = SubmitField('Sign Up')
-
-
-class AddSpecializationForm(FlaskForm):
-    specialization = StringField('Specialization', validators=[Optional()])
                 
 
 def check_uname(form, field):
@@ -233,3 +233,54 @@ class ChangePassForm(FlaskForm):
         EqualTo('password', message="Passwords doesn't match")
     ])
     submit = SubmitField('Change Password')
+
+
+class VitalSigns(FlaskForm):
+    sign = StringField('Sign', [Optional()])
+    value = StringField('Value', [Optional()])
+
+
+class ExaminationNotes(FlaskForm):
+    title = StringField('Title', [Optional()])
+    notes = TextAreaField('Notes', [Optional()])
+
+
+class ExaminationForm(FlaskForm):
+    chief_complaint = TextAreaField('Chief Complaint', [Optional()])
+    vital_signs = FieldList(FormField(VitalSigns), min_entries=1)
+    examination_notes = FieldList(FormField(ExaminationNotes), min_entries=1)
+
+
+class OrderTestForm(FlaskForm):
+    test_name = StringField('Test Name', validators=[Optional()])
+    test_date = DateField('Test Date', validators=[Optional()])
+    additional_notes = TextAreaField('Additional Notes')
+
+
+class TreatmentsForm(FlaskForm):
+    title = StringField('Title', [Optional()])
+    treatment_notes = TextAreaField('Treatment Notes', [Optional()]) 
+
+
+class DiagnosisTreatmentForm(FlaskForm):
+    diagnosis = TextAreaField('Diagnosis', [Optional()])
+    treatments = FieldList(FormField(TreatmentsForm), min_entries=1)
+    medications = FieldList(FormField(MedicationForm), min_entries=1)
+
+
+class FollowUpForm(FlaskForm):
+    follow_up_date = DateField("Date (If Applicable)")
+    follow_up_notes = TextAreaField("Notes")
+
+
+class ExternalDoctorForm(FlaskForm):
+    doctor_name = StringField("Doctor's Name")
+    specialization = StringField("Specialization")
+
+
+class ReferralForm(FlaskForm):
+    referral_date = DateField('Referral Date')
+    doctor = SearchField('Doctor')
+    external_doctor = FieldList(FormField(ExternalDoctorForm), min_entries=1)
+    reason = StringField('Reason for Referral')
+    referral_notes = TextAreaField('Notes')

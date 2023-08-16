@@ -10,7 +10,7 @@
         <form method="post" action="{{ url_for('auth.login') }}">
             {{ form.csrf_token }}
             <dl>
-                {{ render_field(form.username, class="form-control", autocomplete="off") }}
+                {{ render_field(form.username, class="form-control", autocomplete="off", autofocus="on") }}
                 {{ render_field(form.password, class="form-control") }}
             </dl>
             {{ form.submit(class="btn btn-primary my-3") }}

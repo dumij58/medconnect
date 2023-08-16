@@ -192,13 +192,15 @@ document.addEventListener("DOMContentLoaded", function() {
         // Gather data from input fields
         const relationship = document.getElementById("family_medical_history-0-relationship");
         const medicalCondition = document.getElementById("family_medical_history-0-medical_condition");
+        const notes = document.getElementById("family_medical_history-0-notes");
         
         if (relationship.value && medicalCondition.value) {
             familyHistoryMessage.textContent = "";
             // Create vaccination data object
             const familyHistoryData = {
                 relationship: relationship.value,
-                medical_condition: medicalCondition.value
+                medical_condition: medicalCondition.value,
+                notes: notes.value
             };
 
             // Send data to Flask route using fetch API
@@ -216,11 +218,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 tbody.insertAdjacentHTML("beforeend", data.row_html);
             });
         } else {
-            familyHistoryMessage.textContent = "*Please fill in all fields";
+            familyHistoryMessage.textContent = "*Please fill in relashionship and medical condition fields";
         }
         relationship.value = "";
         medicalCondition.value = "";
-        
+        notes.value = "";
     });
 
     const everyTableBody = document.querySelectorAll(".details-table tbody");

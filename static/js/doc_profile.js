@@ -132,6 +132,9 @@ function saveDetails(url) {
         if (data.contact != null) {
             document.getElementById("contact").setAttribute("placeholder", data.contact);
         }
+        if (data.contact != null) {
+            document.getElementById("specializations").setAttribute("placeholder", data.specializations);
+        }
         cancelEditing();
     });
 }

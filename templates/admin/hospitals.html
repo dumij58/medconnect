@@ -32,6 +32,7 @@
         </div>
     </div>
     <div class="table-responsive-md">
+        {% if hospitals %}
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -44,7 +45,6 @@
                 </tr>
             </thead>
             <tbody>
-                {% if hospitals %}
                 {% for item in hospitals %}
                 <tr>
                     <th scope="row">{{ item.id }}</th>
@@ -62,11 +62,11 @@
                     </td>
                 </tr>
                 {% endfor %}
-                {% else %}
-                <div class="fs-6 text-center text-break text-secondary">No hospitals in database</div>
-                {% endif %}
             </tbody>
         </table>
+        {% else %}
+        <div class="fs-6 p-2 mx-2 text-center text-break text-secondary bg-body-tertiary rounded">No hospitals in database</div>
+        {% endif %}
         <script src="{{ url_for('static', filename='/js/show-delete-btn.js') }}"></script>
     </div>
 </div>

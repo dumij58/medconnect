@@ -54,13 +54,13 @@
                         {{ render_field(form.reg_no, class="form-control") }}
                     </div>
                     <div class="col-md">
-                        {{ render_field(form.specialization, class="form-control") }}
+                        {{ render_field(form.specializations, class="form-control") }}
                     </div>
                 </div>
             </div>
-            <!--{% for error in form.errors %}
+            {% for error in form.errors %}
                 <div>{{ error }}</div>
-            {% endfor %}-->
+            {% endfor %}
             {{ form.submit(class="btn btn-primary mx-4 mt-4") }}
         </form>
     </div>

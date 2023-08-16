@@ -1,0 +1,771 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
+    {% from "_formhelpers.html" import render_field %}
+    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="patient-info-tab" data-bs-toggle="tab" data-bs-target="#patient-info-pane" type="button" role="tab" aria-controls="patient-info-pane" aria-selected="true">Patient Information</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination-pane" type="button" role="tab" aria-controls="examination-pane" aria-selected="false">Examination</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="order-tests-tab" data-bs-toggle="tab" data-bs-target="#order-tests-pane" type="button" role="tab" aria-controls="order-tests-pane" aria-selected="false">Tests</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="diagnosis-treatment-tab" data-bs-toggle="tab" data-bs-target="#diagnosis-treatment-pane" type="button" role="tab" aria-controls="diagnosis-treatment-pane" aria-selected="false">Diagnosis & Treatment</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="end-tab" data-bs-toggle="tab" data-bs-target="#end-pane" type="button" role="tab" aria-controls="end-pane" aria-selected="false">End</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active pt-4 px-3" id="patient-info-pane" role="tabpanel" aria-labelledby="patient-info-tab" tabindex="0">
+            <div class="tab-content" id="pills-tabContent">
+                
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Personal</div>
+                    {% from "_formhelpers.html" import render_field %}
+                    <form method="post" action="{{ url_for('pt.change_details') }}">
+                        <div class="container">
+                            <div class="" id="personal-info">
+                                {{ render_field(form.full_name, class="form-control", placeholder=apmt.patient.full_name, disabled=True) }}
+                                <div class="row">
+                                    <div class="col-md">
+                                        {{ render_field(form.gender, class="form-control", data_selected_option=apmt.patient.gender, disabled=True) }}
+                                    </div>
+                                    <div class="col-md">
+                                        {{ render_field(form.dob, class="form-control", data_selected_date=apmt.patient.dob | date, disabled=True) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        {{ render_field(form.email, class="form-control", placeholder=apmt.patient.email, disabled=True) }}
+                                    </div>
+                                    <div class="col-md">
+                                        {{ render_field(form.contact, class="form-control", placeholder=apmt.patient.contact | phone_no, disabled=True) }}
+                                    </div>
+                                    <div class="col-md">
+                                        {{ render_field(form.emergency_contact, class="form-control", placeholder=apmt.patient.emergency_contact | phone_no, disabled=True) }}
+                                    </div>
+                                </div>
+                                {{ render_field(form.address, class="form-control", placeholder=apmt.patient.address, disabled=True) }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Medical History</div>
+                    <div class="mx-4 mb-3">
+                        {% if apmt.patient.medical_history %}
+                        <div class="mt-2 table-responsive-md">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Medical Condition</th>
+                                        <th scope="col">Diagnosis Date</th>
+                                        <th scope="col">Treatment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for item in apmt.patient.medical_history %}
+                                    <tr>
+                                        <td>{{ item.medical_condition }}</td>
+                                        <td>{{ item.diagnosis_date }}</td>
+                                        <td>{{ item.treatment }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-secondary bg-body-secondary rounded">No Medical History Added</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Current Medications</div>
+                    <div class="mx-4 mb-3">
+                        {% if apmt.patient.current_medications %}
+                        <div class="mt-2 table-responsive-md">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Medication Name</th>
+                                        <th scope="col">Dosage</th>
+                                        <th scope="col">Frequency</th>
+                                        <th scope="col">Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for medication in apmt.patient.current_medications %}
+                                    <tr>
+                                        <td>{{ medication.medication_name }}</td>
+                                        <td>{{ medication.dosage }}</td>
+                                        <td>{{ medication.frequency }}</td>
+                                        <td>{{ medication.start_date }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-secondary bg-body-secondary rounded">No Current Medications Added</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Past Surgeries</div>
+                    <div class="mx-4 mb-3">
+                        {% if apmt.patient.past_surgeries %}
+                        <div class="mt-2 table-responsive-md">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Surgery Name</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for surgery in apmt.patient.past_surgeries %}
+                                    <tr>
+                                        <td>{{ surgery.surgery_name }}</td>
+                                        <td>{{ surgery.date }}</td>
+                                        <td>{{ surgery.notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-secondary bg-body-secondary rounded">No Past Surgeries Added</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Vaccinations</div>
+                    <div class="mx-4 mb-3">
+                        {% if apmt.patient.vaccinations %}
+                        <div class="mt-2 table-responsive-md">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Vaccine</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for vaccination in apmt.patient.vaccinations %}
+                                    <tr>
+                                        <td>{{ vaccination.vaccine_name }}</td>
+                                        <td>{{ vaccination.administration_date }}</td>
+                                        <td>{{ vaccination.notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-secondary bg-body-secondary rounded">No Vaccinations Added</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="container pb-3">
+                    <div class="h5 mt-3 mb-3">Family History</div>
+                    <div class="mx-4 mb-3">
+                        {% if apmt.patient.family_medical_history %}
+                        <div class="mt-2 table-responsive-md">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Relationship</th>
+                                        <th scope="col">Medical Condition</th>
+                                        <th scope="col">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for family_member in apmt.patient.family_medical_history %}
+                                    <tr>
+                                        <td>{{ family_member.relationship }}</td>
+                                        <td>{{ family_member.medical_condition }}</td>
+                                        <td>{{ family_member.notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-secondary bg-body-secondary rounded">No Family History Added</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade pt-4 px-3" id="examination-pane" role="tabpanel" aria-labelledby="examination-tab" tabindex="0">
+            <div class="container mb-3">
+                <button class="btn btn-primary dropdown-toggle mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAddPtData" aria-expanded="false" aria-controls="collapseAddPtData">
+                    Add More Patient Information
+                </button>
+                <div class="collapse" id="collapseAddPtData">
+                    <div class="card card-body">
+                        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pills-medical-history-tab" data-bs-toggle="pill" data-bs-target="#pills-medical-history" type="button" role="tab" aria-controls="pills-medical-history" aria-selected="false">Medical History</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-medication-tab" data-bs-toggle="pill" data-bs-target="#pills-medication" type="button" role="tab" aria-controls="pills-medication" aria-selected="false">Current Medications</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-surgery-tab" data-bs-toggle="pill" data-bs-target="#pills-surgery" type="button" role="tab" aria-controls="pills-surgery" aria-selected="false">Past Surgeries</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-vaccination-tab" data-bs-toggle="pill" data-bs-target="#pills-vaccination" type="button" role="tab" aria-controls="pills-vaccination" aria-selected="false">Vaccinations</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-family-history-tab" data-bs-toggle="pill" data-bs-target="#pills-family-history" type="button" role="tab" aria-controls="pills-family-history" aria-selected="false">Family History</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-medical-history" role="tabpanel" aria-labelledby="pills-medical-history-tab" tabindex="0">
+                                <div class="mx-4 mb-3">
+                                    {% for item in form2.medical_history %}
+                                    <div class="row">
+                                        <div class="col-md">
+                                            {{ render_field(item.medical_condition, class="form-control") }}
+                                        </div>
+                                        <div class="col-md">
+                                            {{ render_field(item.diagnosis_date, class="form-control") }}
+                                        </div>
+                                        <div class="col-md">
+                                            {{ render_field(item.treatment, class="form-control") }}
+                                        </div>
+                                        <div class="text-center mb-2">
+                                            <div class="text-danger mb-1" id="medical-history-message"></div>
+                                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-medical-history" data-add-url="{{ url_for('pt.add_medical_history') }}">Add</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% if apmt.patient.medical_history %}
+                                    <div class="mt-2 table-responsive-md">
+                                        <table class="table table-striped details-table" id="medical-history-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Medical Condition</th>
+                                                    <th scope="col">Diagnosis Date</th>
+                                                    <th scope="col">Treatment</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                {% for item in apmt.patient.medical_history %}
+                                                <tr data-id="{{ item.id }}" data-row-type="medical-history">
+                                                    <td>{{ item.medical_condition }}</td>
+                                                    <td>{{ item.diagnosis_date }}</td>
+                                                    <td>{{ item.treatment }}</td>
+                                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="mt-2 text-center text-secondary bg-body-secondary rounded">No Medical History Added</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-medication" role="tabpanel" aria-labelledby="pills-medication-tab" tabindex="0">
+                                <div class="mx-4 mb-3">
+                                    {% for medication in form2.current_medications %}
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {{ render_field(medication.medication_name, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {{ render_field(medication.dosage, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {{ render_field(medication.frequency, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {{ render_field(medication.start_date, class="form-control") }}
+                                        </div>
+                                        <div class="text-center mb-2">
+                                            <div class="text-danger mb-1" id="medication-message"></div>
+                                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-medication" data-add-url="{{ url_for('pt.add_medication') }}">Add</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% if apmt.patient.current_medications %}
+                                    <div class="mt-2 table-responsive-md">
+                                        <table class="table table-striped details-table" id="medication-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Medication Name</th>
+                                                    <th scope="col">Dosage</th>
+                                                    <th scope="col">Frequency</th>
+                                                    <th scope="col">Start Date</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                {% for medication in apmt.patient.current_medications %}
+                                                <tr data-id="{{ medication.id }}" data-row-type="medication">
+                                                    <td>{{ medication.medication_name }}</td>
+                                                    <td>{{ medication.dosage }}</td>
+                                                    <td>{{ medication.frequency }}</td>
+                                                    <td>{{ medication.start_date }}</td>
+                                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center text-secondary bg-body-secondary rounded">No Current Medications Added</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-surgery" role="tabpanel" aria-labelledby="pills-surgery-tab" tabindex="0">
+                                <div class="mx-4 mb-3">
+                                    {% for surgery in form2.past_surgeries %}
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            {{ render_field(surgery.surgery_name, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ render_field(surgery.date, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ render_field(surgery.notes, class="form-control") }}
+                                        </div>
+                                        <div class="text-center mb-2">
+                                            <div class="text-danger mb-1" id="surgery-message"></div>
+                                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-surgery" data-add-url="{{ url_for('pt.add_surgery') }}">Add</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% if apmt.patient.past_surgeries %}
+                                    <div class="mt-2 table-responsive-md">
+                                        <table class="table table-striped details-table" id="surgery-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Surgery Name</th>
+                                                    <th scope="col">Date</th>
+                                                    <th scope="col">Notes</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                {% for surgery in apmt.patient.past_surgeries %}
+                                                <tr data-id="{{ surgery.id }}" data-row-type="surgery">
+                                                    <td>{{ surgery.surgery_name }}</td>
+                                                    <td>{{ surgery.date }}</td>
+                                                    <td>{{ surgery.notes }}</td>
+                                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center text-secondary bg-body-secondary rounded">No Past Surgeries Added</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-vaccination" role="tabpanel" aria-labelledby="pills-vaccination-tab" tabindex="0">
+                                <div class="mx-4 mb-3">
+                                    {% for vaccination in form2.vaccinations %}
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            {{ render_field(vaccination.vaccine_name, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ render_field(vaccination.administration_date, class="form-control") }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ render_field(vaccination.notes, class="form-control") }}
+                                        </div>
+                                        <div class="text-center mb-2">
+                                            <div class="text-danger mb-1" id="vaccination-message"></div>
+                                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-vaccination" data-add-url="{{ url_for('pt.add_vaccination') }}">Add</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% if apmt.patient.vaccinations %}
+                                    <div class="mt-2 table-responsive-md">
+                                        <table class="table table-striped details-table" id="vaccination-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Vaccine</th>
+                                                    <th scope="col">Date</th>
+                                                    <th scope="col">Notes</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                {% for vaccination in apmt.patient.vaccinations %}
+                                                <tr data-id="{{ vaccination.id }}" data-row-type="vaccination">
+                                                    <td>{{ vaccination.vaccine_name }}</td>
+                                                    <td>{{ vaccination.administration_date }}</td>
+                                                    <td>{{ vaccination.notes }}</td>
+                                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center text-secondary bg-body-secondary rounded">No Vaccinations Added</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-family-history" role="tabpanel" aria-labelledby="pills-family-history-tab" tabindex="0">
+                                <div class="mx-4 mb-3">
+                                    {% for family_member in form2.family_medical_history %}
+                                    <div class="row">
+                                        <div class="col-md">
+                                            {{ render_field(family_member.relationship, class="form-control") }}
+                                        </div>
+                                        <div class="col-md">
+                                            {{ render_field(family_member.medical_condition, class="form-control") }}
+                                        </div>
+                                        <div class="col-md">
+                                            {{ render_field(family_member.notes, class="form-control") }}
+                                        </div>
+                                        <div class="text-center mb-2">
+                                            <div class="text-danger mb-1" id="family-history-message"></div>
+                                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-family-history" data-add-url="{{ url_for('pt.add_family_history') }}">Add</button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% if apmt.patient.family_medical_history %}
+                                    <div class="mt-2 table-responsive-md">
+                                        <table class="table table-striped details-table" id="family-history-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Relationship</th>
+                                                    <th scope="col">Medical Condition</th>
+                                                    <th scope="col">Notes</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">
+                                                {% for family_member in apmt.patient.family_medical_history %}
+                                                <tr data-id="{{ family_member.id }}" data-row-type="family-history">
+                                                    <td>{{ family_member.relationship }}</td>
+                                                    <td>{{ family_member.medical_condition }}</td>
+                                                    <td>{{ family_member.notes }}</td>
+                                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center text-secondary bg-body-secondary rounded">No Family History Added</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container px-3">
+                <div class="container mb-5">
+                    <div class="h5 mt-3">Chief Complaint</div>
+                    <div class="mx-2">
+                        {{ form3.chief_complaint(class="form-control", rows="5") }}
+                    </div>
+                </div>
+                <div class="container mb-5">
+                    <div class="h5 mt-3 mb-3">Vital Signs</div>
+                    {% for vital_sign in form3.vital_signs %}
+                    <div class="row mx-3">
+                        <div class="col-md">
+                            {{ render_field(vital_sign.sign, class="form-control") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(vital_sign.value, class="form-control") }}
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="text-danger mb-1" id="vital-signs-message"></div>
+                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-vital-signs" data-add-url="{{ url_for('doc.add_vital_sign', mr_id = medical_record.id ) }}">Add</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="mt-2 px-2 table-responsive-md">
+                        <table class="table table-striped details-table" id="vital-signs-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in medical_record.vital_signs %}
+                                <tr data-id="{{ item.id }}" data-row-type="vital-sign">
+                                    <td>{{ item.sign }}</td>
+                                    <td>{{ item.value }}</td>
+                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="container mb-5">
+                    <div class="h5 mt-3 mb-3">Examination Notes</div>
+                    {% for examination_note in form3.examination_notes %}
+                    <div class="row mx-3">
+                        <div class="col-md">
+                            {{ render_field(examination_note.title, class="form-control", placeholder="Not Required") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(examination_note.notes, class="form-control") }}
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="text-danger mb-1" id="examination-notes-message"></div>
+                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-examination-notes" data-add-url="{{ url_for('doc.add_examination_note', mr_id = medical_record.id ) }}">Add</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="mt-2 px-2 table-responsive-md">
+                        <table class="table table-striped details-table" id="examination-notes-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in medical_record.examination_notes %}
+                                <tr data-id="{{ item.id }}" data-row-type="examination-note">
+                                    <td>{{ item.title }}</td>
+                                    <td>{{ item.notes }}</td>
+                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade pt-4 px-3" id="order-tests-pane" role="tabpanel" aria-labelledby="order-tests-tab" tabindex="0">
+            <div class="container px-3">
+                <div class="container mb-5">
+                    <div class="h5 mt-3 mb-3">Order Tests</div>
+                    <div class="row mx-3">
+                        <div class="col-md">
+                            {{ render_field(form5.test_name, class="form-control") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(form5.additional_notes, class="form-control") }}
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="text-danger mb-1" id="order-test-message"></div>
+                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-order-test" data-add-url="{{ url_for('doc.order_test', mr_id = medical_record.id ) }}">Add</button>
+                        </div>
+                    </div>
+                    <div class="mt-2 px-2 table-responsive-md">
+                        <table class="table table-striped details-table" id="order-tests-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Test Name</th>
+                                    <th scope="col">Test Date</th>
+                                    <th scope="col">Additional Notes</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in medical_record.ordered_tests %}
+                                <tr data-id="{{ item.id }}" data-row-type="order-test">
+                                    <td>{{ item.test_name }}</td>
+                                    <td>{{ item.test_date }}</td>
+                                    <td>{{ item.additional_notes }}</td>
+                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="container mb-5">
+                    <div class="h5 mt-3 mb-3">Test Results</div>
+                    <div class="mx-2 text-center text-secondary bg-body-secondary rounded p-2">Not Implemented</div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade pt-4 px-3" id="diagnosis-treatment-pane" role="tabpanel" aria-labelledby="diagnosis-treatment-tab" tabindex="0">
+            <div class="container px-3">
+                <div class="container mb-5">
+                    <div class="h5 mt-3">Diagnosis</div>
+                    <div class="mx-2">
+                        {{ form4.diagnosis(class="form-control", rows="5") }}
+                    </div>
+                </div>
+                <div class="h5 mt-3 mb-3">Treatments</div>
+                <div class="container mb-5">
+                    <div class="fs-5 mt-3 mb-3">Medication</div>
+                    {% for medication in form4.medications %}
+                    <div class="row mx-3">
+                        <div class="col-md">
+                            {{ render_field(medication.medication_name, class="form-control") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(medication.dosage, class="form-control") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(medication.frequency, class="form-control") }}
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="text-danger mb-1" id="medications-message"></div>
+                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-medications" data-add-url="{{ url_for('doc.add_medication', mr_id = medical_record.id ) }}">Add</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="mt-2 px-2 table-responsive-md">
+                        <table class="table table-striped details-table" id="medications-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Medication</th>
+                                    <th scope="col">Dosage</th>
+                                    <th scope="col">Frequency</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in medical_record.treatment_medications %}
+                                <tr data-id="{{ item.id }}" data-row-type="treatment-medication">
+                                    <td>{{ item.medication_name }}</td>
+                                    <td>{{ item.dosage }}</td>
+                                    <td>{{ item.frequency }}</td>
+                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="container mb-5">
+                    <div class="fs-5 mt-3 mb-3">Other</div>
+                    {% for treatment in form4.treatments %}
+                    <div class="row mx-3">
+                        <div class="col-md">
+                            {{ render_field(treatment.title, class="form-control") }}
+                        </div>
+                        <div class="col-md">
+                            {{ render_field(treatment.treatment_notes, class="form-control") }}
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="text-danger mb-1" id="treatment-message"></div>
+                            <button type="button" class="btn btn-outline-primary" style="width: 25dvw;" id="add-treatment" data-add-url="{{ url_for('doc.add_treatment', mr_id = medical_record.id ) }}">Add</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="mt-2 px-2 table-responsive-md">
+                        <table class="table table-striped details-table" id="treatments-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Notes</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for item in medical_record.treatment_other %}
+                                <tr data-id="{{ item.id }}" data-row-type="treatment-other">
+                                    <td>{{ item.title }}</td>
+                                    <td>{{ item.notes }}</td>
+                                    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade pt-4 px-3" id="end-pane" role="tabpanel" aria-labelledby="end-tab" tabindex="0">
+            <div class="container px-3 mb-4">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="followUpCheck" data-bs-toggle="collapse" data-bs-target="#followUpForm" aria-expanded="false" aria-controls="followUpForm">
+                    <label class="form-check-label" for="followUpCheck">Follow Up</label>
+                </div>
+                <div class="collapse" id="followUpForm">
+                    <div class="card card-body">
+                        <div class="row mx-3">
+                            <div class="col-md">
+                                {{ render_field(form6.follow_up_date, class="form-control") }}
+                            </div>
+                            <div class="col-md">
+                                {{ render_field(form6.follow_up_notes, class="form-control") }}
+                            </div>
+                            <div class="text-center text-danger mb-1" id="follow-up-message"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container px-3 mb-4">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="referralCheck" data-bs-toggle="collapse" data-bs-target="#referralForm" aria-expanded="false" aria-controls="referralForm">
+                    <label class="form-check-label" for="referralCheck">Referral</label>
+                </div>
+                <div class="collapse" id="referralForm">
+                    <div class="card card-body">
+                        <div class="row mx-3">
+                            <div class="col-md">
+                                {{ render_field(form7.doctor, class="form-control", list="doctor-list") }}
+                                <datalist id="doctor-list"></datalist>
+                                <script src="{{ url_for('static', filename='/js/referral_get_doc.js') }}" get-doc-url="{{ url_for('doc.referral_get_doc') }}"></script>
+                            </div>
+                            <div class="col-md">
+                                {{ render_field(form7.referral_date, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="collapse" id="extDoctorForm">
+                            {% for item in form7.external_doctor %}
+                            <div class="row mx-3">
+                                <div class="col-md">
+                                    {{ render_field(item.doctor_name, class="form-control", disabled=True) }}
+                                </div>
+                                <div class="col-md">
+                                    {{ render_field(item.specialization, class="form-control", disabled=True) }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row mx-3">
+                            <div class="col-md">
+                                {{ render_field(form7.reason, class="form-control") }}
+                            </div>
+                            <div class="col-md">
+                                {{ render_field(form7.referral_notes, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="text-center text-danger mb-1" id="referral-message"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="container text-center mx-3 mb-3">
+                <div class="text-danger mb-1" id="end-apmt-message"></div>
+                <button type="button" class="btn btn-primary mx-3 mb-3" id="end-apmt" data-submit-url="{{ url_for('doc.apmt_panel', id = apmt.id) }}">End Appointment</button>
+            </div>
+        </div>
+      </div>
+</div>
+<script src="{{ url_for('static', filename='/js/doc_apmt_panel.js') }}"></script>
+<script src="{{ url_for('static', filename='/js/pt_add_details.js') }}"></script>
+{% endblock %}

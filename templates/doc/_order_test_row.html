@@ -1,0 +1,6 @@
+<tr data-id="{{ order_test.id }}" data-row-type="order-test">
+    <td>{{ order_test.test_name }}</td>
+    <td>{{ order_test.test_date }}</td>
+    <td>{{ order_test.additional_notes }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

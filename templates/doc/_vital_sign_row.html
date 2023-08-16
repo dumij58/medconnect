@@ -1,0 +1,5 @@
+<tr data-id="{{ vital_sign.id }}" data-row-type="vital_sign">
+    <td>{{ vital_sign.sign }}</td>
+    <td>{{ vital_sign.value }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

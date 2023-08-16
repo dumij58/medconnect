@@ -6,7 +6,7 @@ from datetime import datetime
 
 from .helpers import login_required
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log
-from .forms import PtRegForm, DocRegForm, LoginForm, AddDetailsForm, ChangePassForm
+from .forms import PtRegForm, DocRegForm, LoginForm, ChangePassForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -79,7 +79,7 @@ def doc_register():
             email = form.email.data,
             contact = form.contact.data,
             reg_no = form.reg_no.data,
-            specialities = form.specialities.data,
+            specializations = form.specializations.data,
             created = datetime.now()
         )
         db.session.add(new_doctor)
@@ -87,7 +87,7 @@ def doc_register():
         # Append a remark to Log
         append = Log(
             created = datetime.now(),
-            user = DoctorPreVal.query.filter(DoctorPreVal.username == form.username.data).first().username,
+            user = form.username.data,
             remarks = f"Doctor ({form.username.data}) data added to pending validations list"
         )
         db.session.add(append)

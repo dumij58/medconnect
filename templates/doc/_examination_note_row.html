@@ -1,0 +1,5 @@
+<tr data-id="{{ examination_note.id }}" data-row-type="examination-note">
+    <td>{{ examination_note.title }}</td>
+    <td>{{ examination_note.notes }}</td>
+    <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
+</tr>

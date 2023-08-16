@@ -33,7 +33,6 @@
                 <table class="table table-striped details-table" id="medical-history-table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Medical Condition</th>
                             <th scope="col">Diagnosis Date</th>
                             <th scope="col">Treatment</th>
@@ -43,7 +42,6 @@
                     <tbody>
                         {% for mh_row in mh_rows %}
                         <tr data-id="{{ mh_row.MedicalHistory.id }}" data-row-type="medical-history">
-                            <th scope="row">{{ mh_row.MedicalHistory.id }}</th>
                             <td>{{ mh_row.MedicalHistory.medical_condition }}</td>
                             <td>{{ mh_row.MedicalHistory.diagnosis_date }}</td>
                             <td>{{ mh_row.MedicalHistory.treatment }}</td>
@@ -81,7 +79,6 @@
                 <table class="table table-striped details-table" id="medication-table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Medication Name</th>
                             <th scope="col">Dosage</th>
                             <th scope="col">Frequency</th>
@@ -92,7 +89,6 @@
                     <tbody>
                         {% for medication in medications %}
                         <tr data-id="{{ medication.Medication.id }}" data-row-type="medication">
-                            <th scope="row">{{ medication.Medication.id }}</th>
                             <td>{{ medication.Medication.medication_name }}</td>
                             <td>{{ medication.Medication.dosage }}</td>
                             <td>{{ medication.Medication.frequency }}</td>
@@ -128,7 +124,6 @@
                 <table class="table table-striped details-table" id="surgery-table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Surgery Name</th>
                             <th scope="col">Date</th>
                             <th scope="col">Notes</th>
@@ -138,7 +133,6 @@
                     <tbody>
                         {% for surgery in surgeries %}
                         <tr data-id="{{ surgery.Surgery.id }}" data-row-type="surgery">
-                            <th scope="row">{{ surgery.Surgery.id }}</th>
                             <td>{{ surgery.Surgery.surgery_name }}</td>
                             <td>{{ surgery.Surgery.date }}</td>
                             <td>{{ surgery.Surgery.notes }}</td>
@@ -173,8 +167,7 @@
                 <table class="table table-striped details-table" id="vaccination-table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Surgery Name</th>
+                            <th scope="col">Vaccine</th>
                             <th scope="col">Date</th>
                             <th scope="col">Notes</th>
                             <th scope="col"></th>
@@ -183,7 +176,6 @@
                     <tbody>
                         {% for vaccination in vaccinations %}
                         <tr data-id="{{ vaccination.Vaccination.id }}" data-row-type="vaccination">
-                            <th scope="row">{{ vaccination.Vaccination.id }}</th>
                             <td>{{ vaccination.Vaccination.vaccine_name }}</td>
                             <td>{{ vaccination.Vaccination.administration_date }}</td>
                             <td>{{ vaccination.Vaccination.notes }}</td>
@@ -199,11 +191,14 @@
         <div class="mx-4 mb-3">
             {% for family_member in form.family_medical_history %}
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md">
                     {{ render_field(family_member.relationship, class="form-control") }}
                 </div>
-                <div class="col-md-6">
+                <div class="col-md">
                     {{ render_field(family_member.medical_condition, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(family_member.notes, class="form-control") }}
                 </div>
                 <div class="text-center mb-2">
                     <div class="text-danger mb-1" id="family-history-message"></div>
@@ -215,18 +210,18 @@
                 <table class="table table-striped details-table" id="family-history-table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Relationship</th>
                             <th scope="col">Medical Condition</th>
+                            <th scope="col">Notes</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for fh_row in fh_rows %}
                         <tr data-id="{{ fh_row.FamilyHistory.id }}" data-row-type="family-history">
-                            <th scope="row">{{ fh_row.FamilyHistory.id }}</th>
                             <td>{{ fh_row.FamilyHistory.relationship }}</td>
                             <td>{{ fh_row.FamilyHistory.medical_condition }}</td>
+                            <td>{{ fh_row.FamilyHistory.notes }}</td>
                             <td><button type="button" class="btn-close remove-button float-end" data-remove-url="{{ url_for('pt.add_details_remove') }}"></button></td>
                         </tr>
                         {% endfor %}
