@@ -284,3 +284,13 @@ class ReferralForm(FlaskForm):
     external_doctor = FieldList(FormField(ExternalDoctorForm), min_entries=1)
     reason = StringField('Reason for Referral')
     referral_notes = TextAreaField('Notes')
+
+
+class ContactForm(FlaskForm):
+    name = StringField('Name', [data_required])
+    email = EmailField('Email', [
+        data_required,
+        Email(),
+        length(min=6, max=35)
+    ])
+    message = TextAreaField('Message', [data_required])

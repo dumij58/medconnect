@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="h1">{% block title %}Conatct Us{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-4 bg-body-tertiary rounded">
+    <form class="p-3" method="POST" action="{{ url_for('main.contact') }}">
+        {{ form.csrf_token }}
+        {% from "_formhelpers.html" import render_field %}
+        <div class="form-floating mb-2">
+            {{ form.name(class="form-control", placeholder="Name", value=g.user.full_name) }}
+            {{ form.name.label() }}
+        </div>
+        <div class="form-floating mb-2">
+            {{ form.email(class="form-control", placeholder="Email", value=g.user.email) }}
+            {{ form.email.label() }}
+        </div>
+        <div class="form-floating mb-2">
+            {{ form.message(class="form-control", placeholder="Message", style="height: 20rem;") }}
+            {{ form.message.label() }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

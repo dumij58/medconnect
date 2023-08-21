@@ -4,10 +4,11 @@ from flask import (
 from werkzeug.exceptions import abort
 from markupsafe import escape
 from datetime import datetime
+from sqlalchemy import func
 
 from .helpers import admin_only
-from .models import db, DoctorPreVal, Doctor, Log, Hospital, Admin
-from .forms import HlRegForm
+from .models import db, DoctorPreVal, Doctor, Log, Hospital, Admin, Contact
+from .forms import HlRegForm, ContactForm
 
 bp = Blueprint('admin', __name__, url_prefix='/61646d696e')
 
@@ -156,6 +157,24 @@ def hl_remove(hl_id):
     ### todo: Send an email to hospital ###
 
     return redirect(url_for('admin.hospitals'))
+
+
+@bp.route('/6d65737361676573')
+@admin_only
+def messages():
+    form = ContactForm()
+    messages = db.session.execute(db.select(Contact).where(Contact.status != "read")).scalars()
+    msg_count = db.session.execute(db.select(func.count()).select_from(Contact).where(Contact.status != "read")).scalar()
+    return render_template('/admin/messages.html', form = form, messages = messages, msg_count = msg_count)
+
+
+@bp.route('/6d65737361676573/read_<int:id>')
+@admin_only
+def read_messages(id):
+    db.session.execute(db.update(Contact).where(Contact.id == id).values(status = "read"))
+    db.session.commit()
+    flash("Message marked as read.", 'info')
+    return redirect(url_for('admin.messages'))
 
 
 @bp.route('/6c6f67')

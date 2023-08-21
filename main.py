@@ -6,8 +6,8 @@ from markupsafe import escape
 from datetime import datetime, timedelta
 
 from .helpers import login_required, admin_only
-from .models import db, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, Doctor, Patient, Hospital, MedicalRecord
-from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm
+from .models import db, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, Doctor, Patient, Hospital, MedicalRecord, Contact, Log
+from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm, ContactForm
 
 bp = Blueprint('main', __name__)
 
@@ -123,3 +123,40 @@ def medical_record(mr_id):
     form2 = DiagnosisTreatmentForm()
     
     return render_template('main/medical_record.html', record = record, form = form, form2 = form2)
+
+
+@bp.route('/contact', methods=('GET', 'POST'))
+@login_required
+def contact():
+    form = ContactForm()
+
+    if request.method == 'POST' and form.validate():
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+
+        # Add new contact message to database
+        new_message = Contact(
+            created = datetime.now(),
+            name = name,
+            user_type = flask_session.get('user_type'),
+            email = email,
+            message = message
+        )
+        db.session.add(new_message)
+
+        # Append a remark to log
+        append = Log(
+            created = datetime.now(),
+            user = g.user.username,
+            remarks = f"{g.user.username} sent a message through contact page"
+        )
+        db.session.add(append)
+
+        # Commit all changes
+        db.session.commit()
+
+        flash("Message sent!", "success")
+        return redirect(url_for('main.contact'))
+
+    return render_template('main/contact.html', form = form)

@@ -238,3 +238,13 @@ CREATE TABLE order_test (
         FOREIGN KEY(pt_id) REFERENCES patient (id)
 );
 CREATE INDEX ix_order_test_id ON order_test (id);
+CREATE TABLE contact (
+        id INTEGER NOT NULL, 
+        created DATETIME NOT NULL, 
+        name TEXT NOT NULL, 
+        user_type TEXT NOT NULL, 
+        email TEXT NOT NULL, 
+        message TEXT NOT NULL, 
+        PRIMARY KEY (id)
+);
+CREATE INDEX ix_log_id ON log (id);

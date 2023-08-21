@@ -296,7 +296,22 @@ class Admin(db.Model):
 
     def __repr__(self):
         return f'<Admin {self.username}>'
-    
+
+
+class Contact(db.Model):
+    """ Data model for contact form data """
+
+    id = Column(Integer, primary_key=True, index=True)
+    created = Column(DateTime(timezone=False), nullable=False)
+    name = Column(Text, nullable=False)
+    user_type = Column(Text, nullable=False)
+    email = Column(Text, nullable=False)
+    message = Column(Text, nullable=False)
+    status = Column(Text, nullable=False, default="unread")
+
+    def __repr__(self):
+        return f'<Contact {self.id}>'
+
 
 class Log(db.Model):
     """ Data model for logs """
