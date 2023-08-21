@@ -1,11 +1,11 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, jsonify
 )
-from datetime import datetime, timedelta, date as d
-from sqlalchemy.orm import joinedload, lazyload
+from datetime import datetime, timedelta, date as d, time
+from sqlalchemy.orm import joinedload, aliased
 
 from .helpers import login_required, f_datetime
-from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther
+from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther, MedicalRecord
 from .forms import AddDetailsForm
 
 bp = Blueprint('pt', __name__, url_prefix='/pt')
@@ -15,7 +15,7 @@ bp = Blueprint('pt', __name__, url_prefix='/pt')
 @login_required
 def dash():
     user = db.session.execute(db.select(Patient).where(Patient.id == g.user.id)).first().Patient
-    apmts = db.session.execute(db.select(Appointment).where(Patient.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
+    apmts = db.session.execute(db.select(Appointment).where(Patient.id == g.user.id).where(Appointment.status != "ended").where(Appointment.status != "no_show").where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
     return render_template('pt/dash.html', check_details = user.details_added, apmts = apmts)
 
 

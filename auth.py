@@ -49,8 +49,8 @@ def register():
         # Commit all changes to database
         db.session.commit()
         
-        # Redirect to add patient details page
-        # flash('Registration Successful!', "success")
+        # Redirect to login page
+        flash('Registration Successful!', "success")
         return redirect(url_for('auth.login'))
     
     # Render the registration form
@@ -141,12 +141,14 @@ def login():
         
         flash('Login successful!', 'success')
 
-        # Redirect admins to dashboard
+        # Redirect users to their dashboard
         if admin:
             return redirect(url_for('admin.dash'))
+        elif doc:
+            return redirect(url_for('doc.dash'))
+        elif pt:
+            return redirect(url_for('pt.dash'))
         
-        # Redirect other users to index
-        return redirect(url_for('index'))
     
     return render_template('auth/login.html', form = form)
 

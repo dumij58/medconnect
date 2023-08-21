@@ -42,7 +42,7 @@
               </li>
               -->
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Patients</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('main.mr_search') }}">Records</a>
               </li>
               {% else %}
               <li class="nav-item">
@@ -52,7 +52,7 @@
                 <a class="nav-link" aria-current="page" href="{{ url_for('pt.apmts') }}">Appointments</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Records</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('main.mr_search') }}">Records</a>
               </li>
               {% endif %}
             {% endif %}

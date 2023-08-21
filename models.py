@@ -88,6 +88,7 @@ class Doctor(db.Model):
     validated = Column(DateTime(timezone=False), nullable=False)
 
     appointment = db.relationship('Appointment', back_populates='doctor', lazy=True)
+    medical_record = db.relationship('MedicalRecord', back_populates='doctor', lazy=True)
 
     def __repr__(self):
         return f'<Doctor {self.username}>'
@@ -167,7 +168,9 @@ class MedicalRecord(db.Model):
     follow_up_date = Column(Date)
     follow_up_notes = Column(Text)
 
+    doctor = db.relationship('Doctor', back_populates='medical_record', lazy=True)
     patient = db.relationship('Patient', back_populates='medical_record', lazy=True)
+    hospital = db.relationship('Hospital', back_populates='medical_record', lazy=True)
     appointment = db.relationship('Appointment', back_populates='medical_record', lazy=True)
 
     vital_signs = db.relationship('VitalSign', lazy=True)
@@ -277,6 +280,7 @@ class Hospital(db.Model):
     contact = Column(Numeric, nullable=False)
 
     appointment = db.relationship('Appointment', back_populates='hospital', lazy=True)
+    medical_record = db.relationship('MedicalRecord', back_populates='hospital', lazy=True)
 
     def __repr__(self):
         return f'<Hospital {self.id}>'

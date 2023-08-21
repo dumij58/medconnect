@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Records{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
+    <div class="text-center fs-5">Search</div>
+    <form method="get" action="{{ url_for('main.mr_search') }}">
+        <div class="row">
+            {% if session.get('user_type') == 'doctor' %}
+            <div class="col-sm">
+                <div class="mb-1"><label for="pt">Patient</label></div>
+                <div class="mb-3">
+                    <input class="form-control" id="pt" list="patient-list" name="pt" type="search" value="" autocomplete="off">
+                </div>
+                <datalist id="patient-list"></datalist>
+            </div>
+            {% elif session.get('user_type') == 'patient' %}
+            <div class="col-sm">
+                <div class="mb-1"><label for="doc">Doctor</label></div>
+                <div class="mb-3">
+                    <input class="form-control" id="doc" list="doctor-list" name="doc" type="search" value="" autocomplete="off">
+                </div>
+                <datalist id="doctor-list"></datalist>
+            </div>
+            {% endif %}
+            <div class="col-sm">
+                <div class="mb-1"><label for="hl">Hospital</label></div>
+                <div class="mb-3">
+                    <input class="form-control" id="hl" list="hospital-list" name="hl" type="search" value="" autocomplete="off">
+                </div>
+                <datalist id="hospital-list"></datalist>
+            </div>
+            <div class="col-md-3 justify-content-center">
+                <div class="mb-1"><label for="date">Date</label></div>
+                <div class="mb-3">
+                    <input class="form-control" id="date" name="date" type="date" value="">
+                </div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-center pt-2">
+            <input id="search-btn" class="btn btn-primary" type="button" value="Search">
+        </div>
+        <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 50dvw;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center">Please enter {% if session.get('user_type') == 'doctor' %}Patient{% elif session.get('user_type') == 'patient' %}Doctor{% endif %} name or search by selecting Hospital</p>
+                </div>
+              </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
+{% if records %}
+{% for item in records %}
+<div class="card m-2">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md">
+                <div class="row">
+                    <div class="col-md h5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-calendar4-event pb-2" viewBox="0 0 16 16">
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z"/>
+                            <path d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                        </svg>
+                        {{ item.created | dtNoS }}
+                    </div>
+                </div>
+                <div class="row text-secondary">
+                    {% if session.get('user_type') == 'doctor' %}
+                    <div class="col-md mx-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person pb-1" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                        </svg>
+                        {{ item.patient.full_name }}
+                    </div>
+                    {% elif session.get('user_type') == 'patient' %}
+                    <div class="col-sm mx-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person pb-1" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                        </svg>
+                        {{ item.doctor.full_name | dr }}
+                    </div>
+                    <div class="col-sm mx-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-mortarboard pb-1" viewBox="0 0 16 16">
+                            <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917l-7.5-3.5ZM8 8.46 1.758 5.965 8 3.052l6.242 2.913L8 8.46Z"/>
+                            <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Zm-.068 1.873.22-.748 3.496 1.311a.5.5 0 0 0 .352 0l3.496-1.311.22.748L8 12.46l-3.892-1.556Z"/>
+                        </svg>
+                        {% if item.doctor.specializations %}{{ item.doctor.specializations }}{% else %}No specializations{% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md mx-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hospital pb-1" viewBox="0 0 16 16">
+                            <path d="M8.5 5.034v1.1l.953-.55.5.867L9 7l.953.55-.5.866-.953-.55v1.1h-1v-1.1l-.953.55-.5-.866L7 7l-.953-.55.5-.866.953.55v-1.1h1ZM13.25 9a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5ZM13 11.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5Zm.25 1.75a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5Zm-11-4a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 3 9.75v-.5A.25.25 0 0 0 2.75 9h-.5Zm0 2a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5ZM2 13.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5Z"/>
+                            <path d="M5 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 1 1v4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h3V3a1 1 0 0 1 1-1V1Zm2 14h2v-3H7v3Zm3 0h1V3H5v12h1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3Zm0-14H6v1h4V1Zm2 7v7h3V8h-3Zm-8 7V8H1v7h3Z"/>
+                        </svg>
+                        {{ item.hospital.name }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <a href="{{ url_for('main.medical_record', mr_id = item.id ) }}" class="btn btn-primary">View</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+
+{% endif %}
+</div>
+{% if session.get('user_type') == 'doctor' %}
+<script src="{{ url_for('static', filename='js/get-pt-list.js') }}" get-pt-url="{{ url_for('doc.get_pt_list') }}" get-hl-url="{{ url_for('pt.get_hl') }}"></script>
+{% elif session.get('user_type') == 'patient' %}
+<script src="{{ url_for('static', filename='js/session-search.js') }}" get-doc-url="{{ url_for('pt.get_doc') }}" get-hl-url="{{ url_for('pt.get_hl') }}"></script>
+{% endif %}
+{% endblock %}

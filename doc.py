@@ -439,3 +439,11 @@ def referral_get_doc():
     doctors = db.session.execute(db.select(Doctor)).scalars()
     doctor_names = [f"Dr. {doctor.full_name}" for doctor in doctors]
     return jsonify(doctor_names)
+
+""" Get the Patient list into the search form through js """
+@bp.route('/get_pt_list')
+@login_required
+def get_pt_list():
+    patients = db.session.execute(db.select(Patient)).scalars()
+    Patient_names = [patient.full_name for patient in patients]
+    return jsonify(Patient_names)

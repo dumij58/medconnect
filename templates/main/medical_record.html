@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Records{% endblock %}
+
+{% block content %}
+<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
+    <div class="text-center fs-4">Medical Record</div>
+    <div class="container">
+        {% from "_formhelpers.html" import render_field %}
+        <div class="mx-3 mb-3">
+            {{ render_field(form.chief_complaint, class="form-control", rows="5", disabled=True, placeholder=record.chief_complaint) }}
+        </div>
+        <div class="mb-3">
+            <div class="h6">Vital Signs</div>
+            <div class="p-3 table-responsive-md">
+                <table class="table table-borderless-3">
+                    <tbody>
+                        {% for item in record.vital_signs %}
+                        <tr>
+                            <th>{{ item.sign }}</th>
+                            <td>{{ item.value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="h6">Examination Notes</div>
+            <div class="p-3 table-responsive-md">
+                <div class="row row-cols-1 row-cols-xl-2 row-cols-xxl-3 g-3">
+                {% for item in record.examination_notes %}
+                <div class="col-md">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="">{{ item.title }}</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-text">{{ item.notes }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="h6">Ordered Tests</div>
+            <div class="p-3 table-responsive-md">
+                <table class="table table-borderless-3">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Test Date</th>
+                            <th>Additional Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        {% for item in record.ordered_tests %}
+                        <tr>
+                            <td>{{ item.test_name }}</td>
+                            <td>{{ item.test_date }}</td>
+                            <td>{{ item.additional_notes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="p-2">
+                    <div class="mb-1">Test Results</div>
+                    <div class="bg-body-secondary rounded p-1 text-center text-secondary">No test results</div>
+                </div>
+            </div>
+        </div>
+        <div class="mx-3 mb-5">
+            {{ render_field(form2.diagnosis, class="form-control", rows="5", disabled=True, placeholder=record.diagnosis) }}
+        </div>
+        <div class="mb-5">
+            <div class="h6">Treatment</div>
+            <div class="mx-3 mb-3">
+                <div class="fs-6">Medication</div>
+                <div class="p-3 table-responsive-md">
+                    <table class="table table-borderless-3">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Start Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            {% for item in record.treatment_medications %}
+                            <tr>
+                                <td>{{ item.medication_name }}</td>
+                                <td>{{ item.dosage }}</td>
+                                <td>{{ item.frequency }}</td>
+                                <td>{{ item.start_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mx-3 mb-3">
+                <div class="fs-6">Other</div>
+                <div class="p-3 table-responsive-md">
+                    <table class="table table-borderless-3">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            {% for item in record.treatment_other %}
+                            <tr>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.notes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% if record.follow_up_date or record.follow_up_notes %}
+        <div class="mb-5">
+            <div class="h6">Follow Up</div>
+            <div class="row mx-3">
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-sm-2 mb-1 text-center">
+                            <label class="mt-1" for="follow_up_date">Date</label>
+                        </div>
+                        <div class="col-sm mb-3">
+                            <input class="form-control" disabled id="follow_up_date" name="follow_up_date" placeholder="{{ record.follow_up_date }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="">Notes</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-text">{{ record.follow_up_notes }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="fs-6 text-center text-break text-secondary bg-body-secondary rounded p-2 mb-4">No follow up attached</div>
+        {% endif %}
+        {% if record.referral %}
+        {% for item in record.referral %}
+        <div class="mb-5">
+            <div class="h6">Referral</div>
+            <div class="row row-cols-1 row-cols-md-2 mx-3 g-4">
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-lg-3 mb-1">
+                            <label class="mt-1" for="doc-name">Doctor</label>
+                        </div>
+                        <div class="col-lg mb-3">
+                            <input class="form-control" disabled id="doc-name" name="doc-name" placeholder="{% if item.doc_id %}{{ item.medical_record.doctor.full_name | dr }}{% else %}{{ item.external_doc_name }}{% endif %}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-lg-3 mb-1">
+                            <label class="mt-1" for="doc-name">Specialization</label>
+                        </div>
+                        <div class="col-lg mb-3">
+                            <input class="form-control" disabled id="doc-specialization" name="doc-specialization" placeholder="{% if item.doc_id %}{{ item.medical_record.doctor.specializations }}{% else %}{{ item.external_doc_specialization }}{% endif %}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-lg-3 mb-1">
+                            <label class="mt-1" for="referral-date">Date</label>
+                        </div>
+                        <div class="col-lg mb-3">
+                            <input class="form-control" disabled id="referral-date" name="referral-date" placeholder="{{ item.date }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="">Reason</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-text">{{ item.reason }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="fs-6 text-center text-break text-secondary bg-body-secondary rounded p-2 mb-4">No referral attached</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
