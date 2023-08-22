@@ -5,63 +5,70 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container d-flex justify-content-center">
-        <div class="text-center px-4 py-2 w-auto bg-info bg-opacity-10 border border-info-subtle rounded w-auto">
-            If you are not a doctor please use 
-            <a class="link-info link-opacity-75 link-opacity-100-hover link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.register') }}">Normal Registration</a>
+<div class="container d-flex justify-content-center">
+    <div class="text-center px-4 py-2 w-auto bg-info bg-opacity-10 border border-info-subtle rounded w-auto">
+        If you are not a doctor please use 
+        <a class="link-info link-opacity-75 link-opacity-100-hover link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.register') }}">Normal Registration</a>
+    </div>
+</div>
+<p class="text-center my-2">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
+{% from "_formhelpers.html" import render_field %}
+<div class="container mb-5">
+    <form method="post" action="{{ url_for('auth.doc_register') }}">
+        {{ form.csrf_token }}
+        <div class="h5 mt-3 mb-3">Account Details</div>
+        <div class="mx-4">
+            <div class="row">
+                <div class="col-md">
+                    {{ render_field(form.username, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    <a id="info-tooltip" class="float-end link-light" tabindex="0" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-html="true" data-bs-title="<div><strong>Requirements:</strong><br>Minimum 8 characters<br>One lowercase letter<br>One uppercase letter<br>One digit</div>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                    </a>
+                    {{ render_field(form.password, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(form.confirm, class="form-control") }}
+                </div>
+            </div>
         </div>
-    </div>
-    <p class="text-center my-2">Already have an account? <a class="link-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('auth.login') }}">Log In</a></p>
-    {% from "_formhelpers.html" import render_field %}
-    <div class="container mb-5">
-        <form method="post" action="{{ url_for('auth.doc_register') }}">
-            {{ form.csrf_token }}
-            <div class="h5 mt-3 mb-3">Account Details</div>
-            <div class="mx-4">
-                <div class="row">
-                    <div class="col-md">
-                        {{ render_field(form.username, class="form-control") }}
-                    </div>
-                    <div class="col-md">
-                        {{ render_field(form.password, class="form-control") }}
-                    </div>
-                    <div class="col-md">
-                        {{ render_field(form.confirm, class="form-control") }}
-                    </div>
+        <div class="h5 mt-5 mb-3">Doctor Information</div>
+        <div class="mx-4">
+            {{ render_field(form.full_name, class="form-control") }}
+            <div class="row">
+                <div class="col-md">
+                    {{ render_field(form.gender, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(form.dob, class="form-control") }}
                 </div>
             </div>
-            <div class="h5 mt-5 mb-3">Doctor Information</div>
-            <div class="mx-4">
-                {{ render_field(form.full_name, class="form-control") }}
-                <div class="row">
-                    <div class="col-md">
-                        {{ render_field(form.gender, class="form-control") }}
-                    </div>
-                    <div class="col-md">
-                        {{ render_field(form.dob, class="form-control") }}
-                    </div>
+            <div class="row">
+                <div class="col-md">
+                    {{ render_field(form.email, class="form-control") }}
                 </div>
-                <div class="row">
-                    <div class="col-md">
-                        {{ render_field(form.email, class="form-control") }}
-                    </div>
-                    <div class="col-md">
-                        {{ render_field(form.contact, class="form-control") }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md">
-                        {{ render_field(form.reg_no, class="form-control") }}
-                    </div>
-                    <div class="col-md">
-                        {{ render_field(form.specializations, class="form-control") }}
-                    </div>
+                <div class="col-md">
+                    {{ render_field(form.contact, class="form-control") }}
                 </div>
             </div>
-            {% for error in form.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-            {{ form.submit(class="btn btn-primary mx-4 mt-4") }}
-        </form>
-    </div>
+            <div class="row">
+                <div class="col-md">
+                    {{ render_field(form.reg_no, class="form-control") }}
+                </div>
+                <div class="col-md">
+                    {{ render_field(form.specializations, class="form-control") }}
+                </div>
+            </div>
+        </div>
+        {% for error in form.errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+        {{ form.submit(class="btn btn-primary mx-4 mt-4") }}
+    </form>
+</div>
+<script src="{{ url_for('static', filename='js/enable_tooltips.js') }}"></script>
 {% endblock %}

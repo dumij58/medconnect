@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
 from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
+from datetime import date as d, time as t, datetime as dt
 
 from .models import db, Patient, Doctor, Admin, Hospital
 
@@ -17,6 +18,8 @@ def data_required(form, field):
             field_name = "Old Password"
         elif field.name == "reg_no":
             field_name = "Registration No."
+        elif field.name == "confirm":
+            field_name = "Repeat Password"
         else:
             field_name = field.name
         raise ValidationError(message=f'{field_name.capitalize()} is required.')
@@ -42,6 +45,22 @@ def check_user(form, field):
     uname = str(form.username.data).lower()
     if Patient.query.filter(Patient.username == uname).first() or Doctor.query.filter(Doctor.username == uname).first():
         raise ValidationError(message=f"User {uname} already exist.")
+    
+
+def check_pass_requirements(form, field):
+    pwd = str(field.data)
+    noUpper = True
+    noLower = True
+    noDigit = True
+    for i in pwd:
+        if i.isupper():
+            noUpper = False
+        elif i.islower():
+            noLower = False
+        elif i.isdigit():
+            noDigit = False
+    if noUpper or noLower or noDigit or len(pwd) < 8:
+        raise ValidationError(message=f"Password reqirements not met.")
 
 
 class PtRegForm(FlaskForm):
@@ -51,7 +70,10 @@ class PtRegForm(FlaskForm):
         length(min=4, max=25),
         check_user
     ])
-    password = PasswordField('Password', [data_required])
+    password = PasswordField('Password', [
+        data_required,
+        check_pass_requirements
+    ])
     confirm = PasswordField('Repeat Password', [
         data_required,
         EqualTo('password', message="Passwords doesn't match")
@@ -208,10 +230,19 @@ class HlRegForm(FlaskForm):
     contact = TelField('Contact No.', [data_required])
     submit = SubmitField('Add')
 
+
+def check_date(form, field):
+    date = field.data
+    if date <= d.today():
+        raise ValidationError(message=f"Select a future date")
+
     
 class SessionForm(FlaskForm):
     hl_id = SelectField('Hospital', [data_required], coerce=int)
-    date = DateField('Date', [data_required])
+    date = DateField('Date', [
+        data_required,
+        check_date
+    ])
     start_t = TimeField('Start', [data_required])
     end_t = TimeField('End', [data_required])
     submit = SubmitField('Add')

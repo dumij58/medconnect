@@ -50,4 +50,5 @@ def create_app():
     app.jinja_env.filters['time'] = helpers.f_time
     app.jinja_env.filters['noSeconds'] = helpers.f_timeNoS
     app.jinja_env.filters['mins'] = helpers.f_mins
+    
     return app
