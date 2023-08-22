@@ -7,6 +7,7 @@ from datetime import datetime
 from .helpers import login_required
 from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log
 from .forms import PtRegForm, DocRegForm, LoginForm, ChangePassForm
+from .email import send_email
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -98,6 +99,7 @@ def doc_register():
         # Flash a message and redirect to login page
         flash('Registration Successful!', "success")
         flash('Your details are being verified by administrators. Registration confirmation message will be sent to your email.', "info")
+        send_email(form.email.data, "Welcome to MedConnect!", "You have successfully registered with MedConnect. You will recieve an email after your details are verified.")
         return redirect(url_for('auth.login'))
     
     # Render the registration form

@@ -7,10 +7,21 @@ def create_app():
     # Create and configure the app
     app = Flask(__name__,instance_relative_config=True)
     app.config.from_mapping(
+        # Flask
         # SECRET_KEY = secrets.token_hex(),
         SECRET_KEY = "test",
+
+        # Flask-SQLAlchemy
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.instance_path, 'medconnect.sqlite'),
-        SQLALCHEMY_TRACK_MODIFICATIONS = False
+        SQLALCHEMY_TRACK_MODIFICATIONS = False,
+
+        # Flask-Mail
+        MAIL_SERVER = 'smtp.gmail.com',
+        MAIL_PORT = 465,
+        MAIL_USERNAME = 'dumij58.medconnect@gmail.com',
+        MAIL_PASSWORD = 'wqrpdgsdbmagtyyi',
+        MAIL_USE_SSL = True,
+        MAIL_DEFAULT_SENDER = ("MedConnect Support","dumij58.medconnect@gmail.com")
     )
 
     # Ensure the instance folder exists
@@ -19,12 +30,17 @@ def create_app():
     except OSError:
         pass
     
+    # Initialize SQLAlchemy and Flask-Migrate
     from .models import db, migrate
     db.init_app(app)
     migrate.init_app(app, db)
 
     with app.app_context():
         db.create_all()
+
+    # Initialize Flask-Mail
+    from .email import mail
+    mail.init_app(app)
 
     # Import and register blueprints
     from . import auth, admin, main, doc, pt

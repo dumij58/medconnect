@@ -4,10 +4,12 @@ from flask import (
 from werkzeug.exceptions import abort
 from markupsafe import escape
 from datetime import datetime, timedelta
+from asyncio import create_task
 
 from .helpers import login_required, admin_only
 from .models import db, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, Doctor, Patient, Hospital, MedicalRecord, Contact, Log
 from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm, ContactForm
+from .email import send_email
 
 bp = Blueprint('main', __name__)
 
@@ -160,3 +162,11 @@ def contact():
         return redirect(url_for('main.contact'))
 
     return render_template('main/contact.html', form = form)
+
+@bp.route('/test_email', methods=('GET', 'POST'))
+def test_email():
+    subject = "Welcome to MedConnect!"
+    body = "Hello doctor, thank you for registering to MedConnect. You will receive an email after your data is verified."
+    send_email("skeletonox58@gmail.com", subject, body)
+    return "Email sent!"
+    #return render_template('email_template.html', subject = subject, body = body)
