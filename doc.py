@@ -15,7 +15,7 @@ bp = Blueprint('doc', __name__, url_prefix='/doc')
 @bp.route('/dash', methods=('GET', 'POST'))
 @login_required
 def dash():
-    apmts = db.session.execute(db.select(Appointment).where(Doctor.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
+    apmts = db.session.execute(db.select(Appointment).join(Doctor).where(Doctor.id == g.user.id).where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
     doc_sessions = db.session.execute(db.select(DocSession).where(DocSession.doc_id == g.user.id).where(DocSession.date >= d.today()).where(DocSession.date < d.today() + timedelta(days=7)).order_by(DocSession.date).order_by(DocSession.start_t)).all()
     return render_template('doc/dash.html', doc_sessions = doc_sessions, apmts = apmts)
 

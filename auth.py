@@ -49,6 +49,12 @@ def register():
 
         # Commit all changes to database
         db.session.commit()
+
+        # Send an email to user
+        subject = "Welcome to MedConnect!"
+        body = f"Hello {form.username.data}, you have successfully registered with MedConnect. \
+            Now you can login to your account and add your personal and medical details."
+        send_email(form.email.data, subject, body)
         
         # Redirect to login page
         flash('Registration Successful!', "success")
@@ -95,11 +101,15 @@ def doc_register():
 
         # Commit all changes to database
         db.session.commit()
-        
+
+        # Send an email to user
+        subject = "Registration Pending"
+        body = f"Welcome to MedConnect {form.username.data}, you have successfully registered with MedConnect. You will recieve an email after your details are verified."
+        send_email(form.email.data, subject, body)
+
         # Flash a message and redirect to login page
         flash('Registration Successful!', "success")
         flash('Your details are being verified by administrators. Registration confirmation message will be sent to your email.', "info")
-        send_email(form.email.data, "Welcome to MedConnect!", "You have successfully registered with MedConnect. You will recieve an email after your details are verified.")
         return redirect(url_for('auth.login'))
     
     # Render the registration form
@@ -139,7 +149,6 @@ def login():
         )
         db.session.add(append)
         db.session.commit()
-        
         
         flash('Login successful!', 'success')
 
@@ -211,7 +220,7 @@ def user_type_acp():
 @login_required
 def logout():
     flask_session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.login'))
 
 
 """ This is used to add an admin into the database """

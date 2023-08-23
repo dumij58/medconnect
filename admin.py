@@ -1,6 +1,4 @@
-from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
-)
+from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import abort
 from markupsafe import escape
 from datetime import datetime
@@ -9,6 +7,7 @@ from sqlalchemy import func
 from .helpers import admin_only
 from .models import db, DoctorPreVal, Doctor, Log, Hospital, Admin, Contact
 from .forms import HlRegForm, ContactForm
+from .email import send_email
 
 bp = Blueprint('admin', __name__, url_prefix='/61646d696e')
 
@@ -39,6 +38,11 @@ def doc_validate(doc_id):
         validated = datetime.now()
     )
     db.session.add(doc)
+    
+    # Send an email to user
+    subject = "Welcome to MedConnect!"
+    body = f"Greetings {docdata.username}, your registration has been validated. Now you can log into your account."
+    send_email(docdata.email, subject, body)
 
     # Append a remark to log
     append1 = Log(
@@ -59,8 +63,6 @@ def doc_validate(doc_id):
 
     # Commit changes into the database
     db.session.commit()
-    
-    ### todo: Send an email to doctor ###
 
     flash("Doctor added to the database", 'success')
     return redirect(url_for('admin.dash'))
@@ -78,6 +80,11 @@ def doc_reject(doc_id):
             remarks = f"Admin ({g.user.username}) rejected doctor ({docdata.username}) registration"
         )
     db.session.add(append)
+    
+    # Send an email to user
+    subject = "Registration Rejected!"
+    body = f"Sorry {docdata.username}, your registration has been rejected. Please check your details and re-register. If the details you entered are correct please send an email to dumij58.medconnect@gmail.com"
+    send_email(docdata.email, subject, body)
     
     # Delete the temporarily stored doctor data
     db.session.delete(docdata)
