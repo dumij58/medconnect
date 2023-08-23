@@ -4,6 +4,7 @@ from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
 from werkzeug.security import check_password_hash
 from datetime import date as d
 
+from .helpers import f_age
 from .models import db, Patient, Doctor, Admin, Hospital
 
 def data_required(form, field):
@@ -61,7 +62,7 @@ def check_pass_requirements(form, field):
             noDigit = False
     if noUpper or noLower or noDigit or len(pwd) < 8:
         raise ValidationError(message=f"Password reqirements not met.")
-
+    
 
 class PtRegForm(FlaskForm):
     # Account creation details
@@ -141,6 +142,12 @@ class AddDetailsForm(FlaskForm):
     submit = SubmitField('Go to Profile')
 
 
+def check_age(form, field):
+    age = f_age(form.dob.data)
+    if age < 18:
+        raise ValidationError(message=f"Doctor must be at least 18 years old.")
+
+
 class DocRegForm(FlaskForm):
     # Account creation details
     username = StringField('Username', [
@@ -158,7 +165,10 @@ class DocRegForm(FlaskForm):
     gender = SelectField('Gender', [
         data_required
     ], choices=[('','Not Specified'),('m','Male'),('f','Female'),('o','Other')])
-    dob = DateField('Date of Birth', [data_required])
+    dob = DateField('Date of Birth', [
+        data_required,
+        check_age
+    ])
     email = EmailField('Email Address', [
         data_required,
         Email(),

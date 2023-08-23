@@ -64,11 +64,14 @@
                 </div>
             </div>
         </div>
+        <!--
         {% for error in form.errors %}
             <div>{{ error }}</div>
         {% endfor %}
+        -->
         {{ form.submit(class="btn btn-primary mx-4 mt-4") }}
     </form>
 </div>
+<p class="text-center my-2 mb-5">Having trouble signing up? <a class="link-success link-underline-opacity-0 link-underline-opacity-75-hover" href="{{ url_for('main.contact') }}">Contact Us</a></p>
 <script src="{{ url_for('static', filename='js/enable_tooltips.js') }}"></script>
 {% endblock %}

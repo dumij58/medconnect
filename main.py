@@ -169,11 +169,3 @@ def contact():
         return redirect(url_for('main.contact'))
 
     return render_template('main/contact.html', form = form)
-
-@bp.route('/test_email', methods=('GET', 'POST'))
-def test_email():
-    subject = "Welcome to MedConnect!"
-    body = "Hello doctor, thank you for registering to MedConnect. You will receive an email after your data is verified."
-    send_email("skeletonox58@gmail.com", subject, body)
-    return "Email sent!"
-    #return render_template('email_template.html', subject = subject, body = body)
