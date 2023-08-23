@@ -50,61 +50,68 @@ def mr_search():
     hl_id  = db.session.execute(db.select(Hospital.id).where(Hospital.name == request.args.get('hl'))).scalar()
     date  = request.args.get('date')
 
-    print(pt_id)
-
     records = None
     joinedStatement = db.select(MedicalRecord, Doctor, Patient, Hospital).join(Doctor, MedicalRecord.doc_id == Doctor.id).join(Patient, MedicalRecord.pt_id == Patient.id).join(Hospital, MedicalRecord.hl_id == Hospital.id)
 
     # Ensure every possibility of user input gets a result
     u_type = flask_session.get('user_type')
 
-    if not doc_id and not pt_id and hl_id:
-        print("hl")
-        records = db.session.execute(joinedStatement.where(Hospital.id == hl_id).order_by(Doctor.full_name).order_by(MedicalRecord.created)).scalars()
-
-        if date:
-            print("hl, date")
-            dt = datetime.strptime(date, '%Y-%m-%d')
-            records = db.session.execute(joinedStatement.where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
-        
-    elif u_type == 'patient':
+    if u_type == 'patient':
         if doc_id:
             print("doc")
-            records = db.session.execute(joinedStatement.where(Doctor.id == doc_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
+            records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
 
             if date:
                 print("doc, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
-                records = db.session.execute(joinedStatement.where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
+                records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
 
             if hl_id:
                 print("doc, hl")
-                records = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
+                records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
 
                 if date: 
                     print("doc, hl, date")
                     dt = datetime.strptime(date, '%Y-%m-%d')
-                    records = db.session.execute(joinedStatement.where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
-                
+                    records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
+        elif hl_id:
+            print("hl")
+            records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).order_by(Doctor.full_name).order_by(MedicalRecord.created)).scalars()
+
+            if date:
+                print("hl, date")
+                dt = datetime.strptime(date, '%Y-%m-%d')
+                records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
+        
+
+
     elif u_type == 'doctor':
         if pt_id:
             print("pt")
-            records = db.session.execute(joinedStatement.where(Patient.id == pt_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
+            records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
 
             if date:
                 print("pt, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
-                records = db.session.execute(joinedStatement.where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Patient.full_name)).scalars()
+                records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Patient.full_name)).scalars()
             
             if hl_id:
                 print("pt, hl")
-                records = db.session.execute(joinedStatement.where(Patient.id == pt_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
+                records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
 
                 if date:
                     print("pt, hl, date")
                     dt = datetime.strptime(date, '%Y-%m-%d')
-                    records = db.session.execute(joinedStatement.where(Patient.id == pt_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
+                    records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
+        elif hl_id:
+            print("hl")
+            records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).order_by(Doctor.full_name).order_by(MedicalRecord.created)).scalars()
 
+            if date:
+                print("hl, date")
+                dt = datetime.strptime(date, '%Y-%m-%d')
+                records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
+        
     else:
         records = None
     

@@ -56,8 +56,8 @@
     </form>
 </div>
 
-<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
 {% if records %}
+<div class="container-md p-3 mb-3 bg-body-tertiary rounded">
 {% for item in records %}
 <div class="card m-2">
     <div class="card-body">
@@ -112,10 +112,9 @@
     </div>
 </div>
 {% endfor %}
-{% else %}
-
-{% endif %}
 </div>
+{% endif %}
+
 {% if session.get('user_type') == 'doctor' %}
 <script src="{{ url_for('static', filename='js/get-pt-list.js') }}" get-pt-url="{{ url_for('doc.get_pt_list') }}" get-hl-url="{{ url_for('pt.get_hl') }}"></script>
 {% elif session.get('user_type') == 'patient' %}

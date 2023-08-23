@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
 from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
 from werkzeug.security import check_password_hash
-from datetime import date as d, time as t, datetime as dt
+from datetime import date as d
 
 from .models import db, Patient, Doctor, Admin, Hospital
 
@@ -45,7 +45,7 @@ def check_user(form, field):
     uname = str(form.username.data).lower()
     if Patient.query.filter(Patient.username == uname).first() or Doctor.query.filter(Doctor.username == uname).first():
         raise ValidationError(message=f"User {uname} already exist.")
-    
+
 
 def check_pass_requirements(form, field):
     pwd = str(field.data)
