@@ -125,7 +125,13 @@ def mr_search():
 def medical_record(mr_id):
     # Ensure only the respective patient & doctor have access to the medical record
     record = db.session.execute(db.select(MedicalRecord).where(MedicalRecord.id == mr_id)).scalar()
-    if record.patient.id != g.user.id or record.doctor.id != g.user.id:
+    if flask_session.get('user_type') == 'doctor':
+        if record.doctor.id != g.user.id:
+            return render_template('error.html', e_code=403, e_text="Unauthorized")
+    elif flask_session.get('user_type') == 'patient':
+        if record.patient.id != g.user.id:
+            return render_template('error.html', e_code=403, e_text="Unauthorized")
+    else:
         return render_template('error.html', e_code=403, e_text="Unauthorized")
     
     form = ExaminationForm()
@@ -169,3 +175,8 @@ def contact():
         return redirect(url_for('main.contact'))
 
     return render_template('main/contact.html', form = form)
+
+@bp.route('/test_email', methods=('GET', 'POST'))
+def test_email():
+    send_email("skeletonox58@gmail.com", "subject", "body")
+    return "Email Sent!"

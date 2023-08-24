@@ -20,7 +20,7 @@
         <div class="mx-4">
             <div class="row">
                 <div class="col-md">
-                    {{ render_field(form.username, class="form-control") }}
+                    {{ render_field(form.username, class="form-control", autocomplete="off", autofocus="on") }}
                 </div>
                 <div class="col-md">
                     <a id="info-tooltip" class="float-end link-light" tabindex="0" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-html="true" data-bs-title="<div><strong>Requirements:</strong><br>Minimum 8 characters<br>One lowercase letter<br>One uppercase letter<br>One digit</div>">

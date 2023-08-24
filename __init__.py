@@ -21,7 +21,8 @@ def create_app():
         MAIL_USERNAME = 'dumij58.medconnect@gmail.com',
         MAIL_PASSWORD = 'wqrpdgsdbmagtyyi',
         MAIL_USE_SSL = True,
-        MAIL_DEFAULT_SENDER = ("MedConnect Support","dumij58.medconnect@gmail.com")
+        MAIL_DEFAULT_SENDER = ("MedConnect Support","dumij58.medconnect@gmail.com"),
+        MAIL_SUPPRESS_SEND = True
     )
 
     # Ensure the instance folder exists

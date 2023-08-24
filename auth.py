@@ -191,7 +191,7 @@ def change_pass(user_type, id):
                 db.session.execute(db.update(Admin).where(Admin.id == id).values(hash = new_hash))
         db.session.commit()
         flash('Password changed successfully!','success')
-        return redirect(url_for('main.profile', type = flask_session.get('user_type'), id = g.user.id))
+        return redirect(url_for('main.profile', user_type = flask_session.get('user_type'), id = g.user.id))
     else:
         return render_template('auth/change_pass.html',form = form)
 

@@ -739,10 +739,10 @@
                             {% for item in form7.external_doctor %}
                             <div class="row mx-3">
                                 <div class="col-md">
-                                    {{ render_field(item.doctor_name, class="form-control", disabled=True) }}
+                                    {{ render_field(item.doctor_name, class="form-control", disabled=True, placeholder="Dr. John Doe") }}
                                 </div>
                                 <div class="col-md">
-                                    {{ render_field(item.specialization, class="form-control", disabled=True) }}
+                                    {{ render_field(item.specialization, class="form-control", disabled=True, placeholder="Specialization") }}
                                 </div>
                             </div>
                             {% endfor %}
