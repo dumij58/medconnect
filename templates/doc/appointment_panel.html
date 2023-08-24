@@ -255,7 +255,6 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-                                    {% if apmt.patient.medical_history %}
                                     <div class="mt-2 table-responsive-md">
                                         <table class="table table-striped details-table" id="medical-history-table">
                                             <thead>
@@ -278,9 +277,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    {% else %}
-                                    <div class="mt-2 text-center text-secondary bg-body-secondary rounded">No Medical History Added</div>
-                                    {% endif %}
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-medication" role="tabpanel" aria-labelledby="pills-medication-tab" tabindex="0">
@@ -305,7 +301,6 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-                                    {% if apmt.patient.current_medications %}
                                     <div class="mt-2 table-responsive-md">
                                         <table class="table table-striped details-table" id="medication-table">
                                             <thead>
@@ -330,9 +325,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    {% else %}
-                                    <div class="text-center text-secondary bg-body-secondary rounded">No Current Medications Added</div>
-                                    {% endif %}
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-surgery" role="tabpanel" aria-labelledby="pills-surgery-tab" tabindex="0">
@@ -354,7 +346,6 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-                                    {% if apmt.patient.past_surgeries %}
                                     <div class="mt-2 table-responsive-md">
                                         <table class="table table-striped details-table" id="surgery-table">
                                             <thead>
@@ -377,9 +368,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    {% else %}
-                                    <div class="text-center text-secondary bg-body-secondary rounded">No Past Surgeries Added</div>
-                                    {% endif %}
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-vaccination" role="tabpanel" aria-labelledby="pills-vaccination-tab" tabindex="0">
@@ -401,7 +389,6 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-                                    {% if apmt.patient.vaccinations %}
                                     <div class="mt-2 table-responsive-md">
                                         <table class="table table-striped details-table" id="vaccination-table">
                                             <thead>
@@ -424,9 +411,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    {% else %}
-                                    <div class="text-center text-secondary bg-body-secondary rounded">No Vaccinations Added</div>
-                                    {% endif %}
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-family-history" role="tabpanel" aria-labelledby="pills-family-history-tab" tabindex="0">
@@ -448,7 +432,6 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-                                    {% if apmt.patient.family_medical_history %}
                                     <div class="mt-2 table-responsive-md">
                                         <table class="table table-striped details-table" id="family-history-table">
                                             <thead>
@@ -471,9 +454,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    {% else %}
-                                    <div class="text-center text-secondary bg-body-secondary rounded">No Family History Added</div>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>

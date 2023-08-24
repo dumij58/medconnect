@@ -220,7 +220,7 @@
                             <label class="mt-1" for="doc-name">Doctor</label>
                         </div>
                         <div class="col-lg mb-3">
-                            <input class="form-control" disabled id="doc-name" name="doc-name" placeholder="{% if item.doc_id %}{{ item.medical_record.doctor.full_name | dr }}{% else %}{{ item.external_doc_name }}{% endif %}">
+                            <input class="form-control" disabled id="doc-name" name="doc-name" placeholder="{% if item.doc_id %}{{ item.doctor.full_name | dr }}{% else %}{{ item.doc_id }}{% endif %}">
                         </div>
                     </div>
                 </div>
@@ -230,7 +230,7 @@
                             <label class="mt-1" for="doc-name">Specialization</label>
                         </div>
                         <div class="col-lg mb-3">
-                            <input class="form-control" disabled id="doc-specialization" name="doc-specialization" placeholder="{% if item.doc_id %}{{ item.medical_record.doctor.specializations }}{% else %}{{ item.external_doc_specialization }}{% endif %}">
+                            <input class="form-control" disabled id="doc-specialization" name="doc-specialization" placeholder="{% if item.doc_id %}{{ item.doctor.specializations }}{% else %}{{ item.external_doc_specialization }}{% endif %}">
                         </div>
                     </div>
                 </div>

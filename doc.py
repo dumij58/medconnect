@@ -184,7 +184,7 @@ def apmt_panel(id):
         # Add referral form data if exists
         if "referral_reason" in apmt_data:
             if "doctor" in apmt_data:
-                doc_id = db.session.execute(db.select(Doctor.id).where(Doctor.full_name == apmt_data["doctor"])).scalar()
+                doc_id = db.session.execute(db.select(Doctor.id).where(Doctor.full_name == str(apmt_data["doctor"])[4:])).scalar()
                 new_referral = Referral(
                     mr_id = medical_record.id,
                     date = d.today(),
