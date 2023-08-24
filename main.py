@@ -8,7 +8,7 @@ from asyncio import create_task
 
 from .helpers import login_required, admin_only
 from .models import db, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, Doctor, Patient, Hospital, MedicalRecord, Contact, Log
-from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm, ContactForm
+from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm, ContactForm, HlRegForm
 from .email import send_email
 
 bp = Blueprint('main', __name__)
@@ -60,28 +60,22 @@ def mr_search():
 
     if u_type == 'patient':
         if doc_id:
-            print("doc")
             records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
 
             if date:
-                print("doc, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
                 records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
 
             if hl_id:
-                print("doc, hl")
                 records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
 
-                if date: 
-                    print("doc, hl, date")
+                if date:
                     dt = datetime.strptime(date, '%Y-%m-%d')
                     records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Doctor.id == doc_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
         elif hl_id:
-            print("hl")
             records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).order_by(Doctor.full_name).order_by(MedicalRecord.created)).scalars()
 
             if date:
-                print("hl, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
                 records = db.session.execute(joinedStatement.where(Patient.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
         
@@ -89,28 +83,22 @@ def mr_search():
 
     elif u_type == 'doctor':
         if pt_id:
-            print("pt")
             records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).order_by(Hospital.name).order_by(MedicalRecord.created)).scalars()
 
             if date:
-                print("pt, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
                 records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Patient.full_name)).scalars()
             
             if hl_id:
-                print("pt, hl")
                 records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).where(Hospital.id == hl_id).order_by(MedicalRecord.created)).scalars()
 
                 if date:
-                    print("pt, hl, date")
                     dt = datetime.strptime(date, '%Y-%m-%d')
                     records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Patient.id == pt_id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(MedicalRecord.created)).scalars()
         elif hl_id:
-            print("hl")
             records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).order_by(Doctor.full_name).order_by(MedicalRecord.created)).scalars()
 
             if date:
-                print("hl, date")
                 dt = datetime.strptime(date, '%Y-%m-%d')
                 records = db.session.execute(joinedStatement.where(Doctor.id == g.user.id).where(Hospital.id == hl_id).where(MedicalRecord.created > dt).where(MedicalRecord.created < dt + timedelta(days=1)).order_by(Doctor.full_name)).scalars()
         
@@ -125,6 +113,7 @@ def mr_search():
 def medical_record(mr_id):
     # Ensure only the respective patient & doctor have access to the medical record
     record = db.session.execute(db.select(MedicalRecord).where(MedicalRecord.id == mr_id)).scalar()
+
     if flask_session.get('user_type') == 'doctor':
         if record.doctor.id != g.user.id:
             return render_template('error.html', e_code=403, e_text="Unauthorized")
@@ -136,8 +125,11 @@ def medical_record(mr_id):
     
     form = ExaminationForm()
     form2 = DiagnosisTreatmentForm()
+    pt_form = PtRegForm()
+    doc_form = DocRegForm()
+    hl_form = HlRegForm()
     
-    return render_template('main/medical_record.html', record = record, form = form, form2 = form2)
+    return render_template('main/medical_record.html', record = record, form = form, form2 = form2, pt_form = pt_form, doc_form = doc_form, hl_form = hl_form)
 
 
 @bp.route('/contact', methods=('GET', 'POST'))

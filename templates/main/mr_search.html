@@ -59,6 +59,7 @@
 {% if records %}
 <div class="container-md p-3 mb-3 bg-body-tertiary rounded">
 {% for item in records %}
+{% if item.appointment.status != 'ongoing' %}
 <div class="card m-2">
     <div class="card-body">
         <div class="row align-items-center">
@@ -111,6 +112,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endfor %}
 </div>
 {% endif %}

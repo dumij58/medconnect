@@ -2,10 +2,10 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
 from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
 from werkzeug.security import check_password_hash
-from datetime import date as d
+from datetime import date as d, timedelta
 
 from .helpers import f_age
-from .models import db, Patient, Doctor, Admin, Hospital
+from .models import db, Patient, Doctor, Admin, Hospital, DocSession
 
 def data_required(form, field):
     if not field.data:
@@ -243,8 +243,28 @@ class HlRegForm(FlaskForm):
 
 def check_date(form, field):
     date = field.data
-    if date <= d.today():
+    if date <= d.today() + timedelta(days=1):
         raise ValidationError(message=f"Select a future date")
+    
+
+def check_time_overlap(form, field):
+    date = form.date.data
+    time = field.data
+    st = form.start_t.data
+    et = form.end_t.data
+    sessions = db.session.execute(db.select(DocSession).where(DocSession.date == date)).scalars()
+    for session in sessions:
+        # Ensure start and end times of the new session doesn't overlap with existing ones
+        if time >= session.start_t and time <= session.end_t:
+            if field == form.start_t:
+                raise ValidationError(message=f"Start time overlapping with an existing session")
+            elif field == form.end_t:
+                raise ValidationError(message=f"End time overlapping with an existing session")
+            
+        elif st <= session.start_t and et >= session.end_t:
+            if field == form.end_t:
+                raise ValidationError(message=f"Session time overlapping with an existing session")
+    
 
     
 class SessionForm(FlaskForm):
@@ -253,8 +273,14 @@ class SessionForm(FlaskForm):
         data_required,
         check_date
     ])
-    start_t = TimeField('Start', [data_required])
-    end_t = TimeField('End', [data_required])
+    start_t = TimeField('Start', [
+        data_required,
+        check_time_overlap
+    ])
+    end_t = TimeField('End', [
+        data_required,
+        check_time_overlap
+    ])
     submit = SubmitField('Add')
 
 

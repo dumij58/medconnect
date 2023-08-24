@@ -35,10 +35,16 @@
                 <div class="card-title">
                     <button type="button" class="btn-close float-end" data-bs-toggle="modal" data-bs-target="#delSessionModal{{ item.DocSession.id }}"></button>
                     {% from "_modalhelpers.html" import render_modal %}
+                    {% if item.DocSession.apmt_count == 0 %}
                     {{ render_modal(
                         "delSessionModal" + str(item.DocSession.id), "Are you sure?", 
                         "This action removes session " ~ item.DocSession.date ~ " (" ~ item.DocSession.start_t | noSeconds ~ " to " ~ item.DocSession.end_t | noSeconds ~ ") from the database",
                         "Remove", url_for('doc.session_remove', s_id = item.DocSession.id), "danger" ) }}
+                    {% else %}
+                    {{ render_modal(
+                        "delSessionModal" + str(item.DocSession.id), "Alert!", 
+                        "You can't remove a session that already has at least 1 appointment") }}
+                    {% endif %}
                     <div class="row">
                         <div class="col-md h5">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-calendar4-event pb-1 me-2" viewBox="0 0 16 16">

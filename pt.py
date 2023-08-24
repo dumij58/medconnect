@@ -13,7 +13,7 @@ bp = Blueprint('pt', __name__, url_prefix='/pt')
 def dash():
     user = db.session.execute(db.select(Patient).where(Patient.id == g.user.id)).scalar()
     apmts = db.session.execute(db.select(Appointment).join(Patient).where(Patient.id == g.user.id).where(Appointment.status != "ended").where(Appointment.status != "no_show").where(Appointment.datetime >= datetime.now()).order_by(Appointment.datetime)).all()
-    records = db.session.execute(db.select(MedicalRecord).limit(3).join(Patient).where(Patient.id == g.user.id).order_by(MedicalRecord.created.desc())).scalars()
+    records = db.session.execute(db.select(MedicalRecord).limit(5).join(Patient).where(Patient.id == g.user.id).order_by(MedicalRecord.created.desc())).scalars()
     return render_template('pt/dash.html', check_details = user.details_added, apmts = apmts, records = records)
 
 
