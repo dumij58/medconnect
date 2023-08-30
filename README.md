@@ -10,6 +10,64 @@
 > 
 > PS : I know encryption is a requirement for an EHR system
 
+<br>
+
+<details>
+
+<summary>Want to test MedConnect ?</summary>
+
+<br>
+
+### Clone MedConnect Repository
+
+```shell
+# Install virtualenv (assuming you have installed python3-pip)
+pip install virtualenv
+
+# Make a new directory (Choose any name for the directory) and go inside it
+mkdir Test
+cd Test
+
+# Create python virtual environment
+virtualenv venv
+
+# Activate venv
+source venv/bin/activate
+
+# Clone Medconnect repository
+git clone https://github.com/dumij58/medconnect.git
+
+```
+
+### From here you can continue in 2 ways (Choose one):
+
+Installing Medconnect
+
+```shell
+# cd into medconnect repository
+cd medconnect
+
+# Install MedConnect using pip (using -e will make medconnect package editable)
+pip install -e .
+
+# Run flask development server
+flask --app medconnect run
+```
+
+Without installing MedConnect
+
+```shell
+# cd into medconnect package inside the medconnect repository
+cd medconnect/medconnect
+
+# Run flask development server
+flask --app medconnect run
+```
+
+</details>
+
+<br>
+
 <details>
 
 <summary>See what each Python file does</summary>
@@ -43,6 +101,13 @@ This file handles everything related to user authentication.
 It handles the validation of registration form data of both doctor and patient registration, validation of login data of all 3 user types and while doing that plug the sqlalchemy user object into the flask's g namespace object and create a "user_type" variable inside flask session to show the type of the current logged in user, use flask's app_context_processor() function to make the "user_type" accessible throughout the application, user logout commands and lastly add an admin into the database manually.
 
 <!-- Include add admin instructions -->
+<details>
+
+<summary>How to add an admin?</summary>
+
+There is a flask route defined in order to add an admin. You can find the route inside the auth.py file. Type that route into your browser and you will see a form. Give a username, password and a identification no. (any number would work) and submit the form. Admin will be added to the database instantly, now admin can log in using the login page.
+
+</details>
 
 ## doc.py
 
@@ -68,9 +133,9 @@ This file contains everyhting else that I couldn't specify as either doctor or p
 
 It handles displaying medconnect homepage, displays profiles for doctors and patients, search medical records for both patients and doctors, show medical records (only the respective patient and doctor have access to it), display contact page and store messages sent through the contact page.
 
- <br>
-
 </details>
+
+<br>
 
 ## Register
 
