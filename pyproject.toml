@@ -5,12 +5,12 @@ description = "MedConnect is an Electronic Health Records (EHR) System integrate
 dependencies = [
     "flask",
     "flask_sqlalchemy",
-    "sqlalchemy"
+    "sqlalchemy",
     "flask_migrate",
     "flask_wtf",
     "wtforms",
     "wtforms[email]",
-    "flask_mail"
+    "flask_mail",
 ]
 
 [build-system]
