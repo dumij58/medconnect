@@ -10,16 +10,39 @@
         {{ form.csrf_token }}
         {% from "_formhelpers.html" import render_field %}
         <div class="form-floating mb-2">
+            {% if g.user %}
             {{ form.name(class="form-control", placeholder="Name", value=g.user.full_name) }}
+            {% else %}
+            {{ form.name(class="form-control", placeholder="Name") }}
+            {% endif %}
             {{ form.name.label() }}
+            {% if form.name.errors %}
+            <div class="errors">
+                <div class="text-danger">* {{ form.name.errors[0] }}</div>
+            </div>
+            {% endif %}
         </div>
         <div class="form-floating mb-2">
+            {% if g.user %}
             {{ form.email(class="form-control", placeholder="Email", value=g.user.email) }}
+            {% else %}
+            {{ form.email(class="form-control", placeholder="Email") }}
+            {% endif %}
             {{ form.email.label() }}
+            {% if form.email.errors %}
+            <div class="errors">
+                <div class="text-danger">* {{ form.email.errors[0] }}</div>
+            </div>
+            {% endif %}
         </div>
         <div class="form-floating mb-2">
             {{ form.message(class="form-control", placeholder="Message", style="height: 20rem;") }}
             {{ form.message.label() }}
+            {% if form.message.errors %}
+            <div class="errors">
+                <div class="text-danger">* {{ form.message.errors[0] }}</div>
+            </div>
+            {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

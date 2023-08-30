@@ -133,7 +133,6 @@ def medical_record(mr_id):
 
 
 @bp.route('/contact', methods=('GET', 'POST'))
-@login_required
 def contact():
     form = ContactForm()
 
@@ -142,11 +141,18 @@ def contact():
         email = request.form.get("email")
         message = request.form.get("message")
 
+        if g.user:
+            user_name = g.user.username
+            user_type = flask_session.get('user_type')
+        else:
+            user_name = "Not in DB"
+            user_type = "Not in DB"
+
         # Add new contact message to database
         new_message = Contact(
             created = datetime.now(),
             name = name,
-            user_type = flask_session.get('user_type'),
+            user_type = user_type,
             email = email,
             message = message
         )
@@ -155,8 +161,8 @@ def contact():
         # Append a remark to log
         append = Log(
             created = datetime.now(),
-            user = g.user.username,
-            remarks = f"{g.user.username} sent a message through contact page"
+            user = user_name,
+            remarks = f"User {user_name} - {email} sent a message through contact page"
         )
         db.session.add(append)
 
