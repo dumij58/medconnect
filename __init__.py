@@ -1,15 +1,13 @@
 import os
-# import secrets
 from flask import Flask
 
 
 def create_app():
     # Create and configure the app
-    app = Flask(__name__,instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # Flask
-        # SECRET_KEY = secrets.token_hex(),
-        SECRET_KEY = "test",
+        SECRET_KEY = "dev",
 
         # Flask-SQLAlchemy
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.instance_path, 'medconnect.sqlite'),
@@ -18,12 +16,15 @@ def create_app():
         # Flask-Mail
         MAIL_SERVER = 'smtp.gmail.com',
         MAIL_PORT = 465,
-        MAIL_USERNAME = 'dumij58.medconnect@gmail.com',
-        MAIL_PASSWORD = 'wqrpdgsdbmagtyyi',
+        MAIL_USERNAME = "support@example.com",
+        MAIL_PASSWORD = "password",
+        MAIL_DEFAULT_SENDER = ("Support", "support@example.com"),
         MAIL_USE_SSL = True,
-        MAIL_DEFAULT_SENDER = ("MedConnect Support","dumij58.medconnect@gmail.com"),
         MAIL_SUPPRESS_SEND = True
     )
+
+    # load the instance config, if it exists
+    app.config.from_pyfile('config.py', silent=True)
 
     # Ensure the instance folder exists
     try:
