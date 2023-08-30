@@ -68,6 +68,8 @@ This file contains everyhting else that I couldn't specify as either doctor or p
 
 It handles displaying medconnect homepage, displays profiles for doctors and patients, search medical records for both patients and doctors, show medical records (only the respective patient and doctor have access to it), display contact page and store messages sent through the contact page.
 
+ <br>
+
 </details>
 
 ## Register
