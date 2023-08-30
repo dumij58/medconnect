@@ -16,8 +16,6 @@
 
 <summary>Want to test MedConnect ?</summary>
 
-<br>
-
 ### Clone MedConnect Repository
 
 ```shell
@@ -25,8 +23,8 @@
 pip install virtualenv
 
 # Make a new directory (Choose any name for the directory) and go inside it
-mkdir Test
-cd Test
+mkdir test
+cd test
 
 # Create python virtual environment
 virtualenv venv
@@ -41,7 +39,7 @@ git clone https://github.com/dumij58/medconnect.git
 
 ### From here you can continue in 2 ways (Choose one):
 
-Installing Medconnect
+1. Installing Medconnect
 
 ```shell
 # cd into medconnect repository
@@ -54,7 +52,7 @@ pip install -e .
 flask --app medconnect run
 ```
 
-Without installing MedConnect
+2. Without installing MedConnect
 
 ```shell
 # cd into medconnect package inside the medconnect repository
@@ -64,9 +62,9 @@ cd medconnect/medconnect
 flask --app medconnect run
 ```
 
-</details>
-
 <br>
+
+</details>
 
 <details>
 
@@ -100,10 +98,10 @@ This file handles everything related to user authentication.
 
 It handles the validation of registration form data of both doctor and patient registration, validation of login data of all 3 user types and while doing that plug the sqlalchemy user object into the flask's g namespace object and create a "user_type" variable inside flask session to show the type of the current logged in user, use flask's app_context_processor() function to make the "user_type" accessible throughout the application, user logout commands and lastly add an admin into the database manually.
 
-<!-- Include add admin instructions -->
 <details>
 
 <summary>How to add an admin?</summary>
+<br>
 
 There is a flask route defined in order to add an admin. You can find the route inside the auth.py file. Type that route into your browser and you will see a form. Give a username, password and a identification no. (any number would work) and submit the form. Admin will be added to the database instantly, now admin can log in using the login page.
 
@@ -206,6 +204,8 @@ Once you start the appointment an entry in medical record table is created. Afte
 
 > [!WARNING]
 > Because of the way this is implemented, you cannot cancel an appointment and delete its data, once it is started.
+
+<br>
 
 </details>
 
