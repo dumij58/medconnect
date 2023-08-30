@@ -1,11 +1,10 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
-from werkzeug.exceptions import abort
 from markupsafe import escape
 from datetime import datetime
 from sqlalchemy import func
 
 from .helpers import admin_only
-from .models import db, DoctorPreVal, Doctor, Log, Hospital, Admin, Contact
+from .models import db, DoctorPreVal, Doctor, Log, Hospital, Contact
 from .forms import HlRegForm, ContactForm
 from .email import send_email
 
@@ -91,8 +90,6 @@ def doc_reject(doc_id):
 
     # Commit changes into the database
     db.session.commit()
-
-    ### todo: Send an email to doctor ###
 
     flash("Doctor registration rejected", 'info')
     return redirect(url_for('admin.dash'))

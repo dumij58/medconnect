@@ -1,5 +1,5 @@
-from flask import Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, jsonify
-from datetime import datetime, timedelta, date as d, time
+from flask import Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
+from datetime import datetime, timedelta, date as d
 
 from .helpers import login_required, f_datetime
 from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther, MedicalRecord

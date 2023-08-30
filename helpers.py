@@ -1,9 +1,9 @@
 import functools
 
 from flask import redirect, url_for, render_template, g
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 
-from .models import db, Admin, Hospital, Doctor, DocSession
+from .models import Admin
 
 def login_required(view):
     @functools.wraps(view)

@@ -1,15 +1,11 @@
 from flask import (
     Blueprint, g, flash, redirect, render_template, request, url_for, session as flask_session
 )
-from werkzeug.exceptions import abort
-from markupsafe import escape
 from datetime import datetime, timedelta
-from asyncio import create_task
 
-from .helpers import login_required, admin_only
+from .helpers import login_required
 from .models import db, Medication, Surgery, Vaccination, FamilyHistory, MedicalHistory, Doctor, Patient, Hospital, MedicalRecord, Contact, Log
 from .forms import DocRegForm, PtRegForm, AddDetailsForm, ExaminationForm, DiagnosisTreatmentForm, ContactForm, HlRegForm
-from .email import send_email
 
 bp = Blueprint('main', __name__)
 
@@ -173,8 +169,3 @@ def contact():
         return redirect(url_for('main.contact'))
 
     return render_template('main/contact.html', form = form)
-
-@bp.route('/test_email', methods=('GET', 'POST'))
-def test_email():
-    send_email("skeletonox58@gmail.com", "subject", "body")
-    return "Email Sent!"

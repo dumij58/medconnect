@@ -2,11 +2,10 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session as flask_session, url_for, jsonify
 )
 from markupsafe import escape
-from werkzeug.security import generate_password_hash
 from datetime import datetime, date as d, timedelta
 
 from .helpers import login_required, f_time, f_date, calc_total_apmts
-from .models import db, Patient, Doctor, DoctorPreVal, Admin, Log, Hospital, DocSession, Appointment, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther, Medication, Referral, MedicalRecord
+from .models import db, Patient, Doctor, Admin, Log, Hospital, DocSession, Appointment, VitalSign, ExaminationNote, OrderTest, TreatmentMedications, TreatmentOther, Medication, Referral, MedicalRecord
 from .forms import SessionForm, PtRegForm, AddDetailsForm, ExaminationForm, OrderTestForm, DiagnosisTreatmentForm, FollowUpForm, ReferralForm
 
 bp = Blueprint('doc', __name__, url_prefix='/doc')
