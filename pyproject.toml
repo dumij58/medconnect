@@ -1,0 +1,18 @@
+[project]
+name = "medconnect"
+version = "1.0.0"
+description = "MedConnect is an Electronic Health Records (EHR) System integrated with an Appointment Management System to keep track of appointments and access your medical records all in one place. Whether you're a patient or a healthcare provider, MedConnect offers a user-friendly platform to manage your medical information and appointments with ease."
+dependencies = [
+    "flask",
+    "flask_sqlalchemy",
+    "sqlalchemy"
+    "flask_migrate",
+    "flask_wtf",
+    "wtforms",
+    "wtforms[email]",
+    "flask_mail",
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
