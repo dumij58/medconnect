@@ -1,3 +1,4 @@
+from flask import g
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, TimeField, EmailField, SubmitField, TelField, SelectField, TextAreaField, SearchField, FieldList, FormField
 from wtforms.validators import Length, EqualTo, Email, ValidationError, Optional
@@ -44,7 +45,7 @@ def length(min=-1, max=-1):
 
 def check_user(form, field):
     uname = str(form.username.data).lower()
-    if Patient.query.filter(Patient.username == uname).first() or Doctor.query.filter(Doctor.username == uname).first():
+    if Patient.query.filter(Patient.username == uname).first() or Doctor.query.filter(Doctor.username == uname).first() or Admin.query.filter(Admin.username == uname).first():
         raise ValidationError(message=f"User {uname} already exist.")
 
 
@@ -252,7 +253,7 @@ def check_time_overlap(form, field):
     time = field.data
     st = form.start_t.data
     et = form.end_t.data
-    sessions = db.session.execute(db.select(DocSession).where(DocSession.date == date)).scalars()
+    sessions = db.session.execute(db.select(DocSession).where(DocSession.doc_id == g.user.id).where(DocSession.date == date)).scalars()
     for session in sessions:
         # Ensure start and end times of the new session doesn't overlap with existing ones
         if time >= session.start_t and time <= session.end_t:
