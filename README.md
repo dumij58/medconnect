@@ -62,6 +62,11 @@ cd medconnect/medconnect
 flask --app medconnect run
 ```
 
+#### When you are done testing
+```shell
+deactivate
+```
+
 <br>
 
 </details>
